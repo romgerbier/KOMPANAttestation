@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#111111"/>
 
   <!-- Icône iOS (K blanc fond vert) inline SVG → PNG base64 -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%232E7D32'/%3E%3Ctext x='90' y='128' font-family='Arial Black,sans-serif' font-weight='900' font-size='110' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E"/>
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMTgwIDE4MCI+CiAgPHJlY3Qgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIHJ4PSIzOCIgZmlsbD0iIzJFN0QzMiIvPgogIDx0ZXh0IHg9IjkwIiB5PSIxMzIiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjaywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxMDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5LPC90ZXh0Pgo8L3N2Zz4="/>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -260,11 +260,20 @@
       display: block;
     }
     .pdf-hint {
-      text-align: center; padding: 14px 20px;
+      text-align: center; padding: 12px 16px;
       background: #1a1a1a; border-top: 1px solid #333;
       flex-shrink: 0;
     }
     .pdf-hint p { color: #888; font-size: 13px; margin-bottom: 10px; }
+    .pdf-share-btn {
+      display: block; width: 100%;
+      background: #fff; border: 2px solid #E30613;
+      border-radius: 8px; color: #E30613;
+      font-weight: 800; font-size: 16px;
+      padding: 13px 24px; cursor: pointer;
+      font-family: inherit; margin-bottom: 10px;
+      letter-spacing: 0.03em;
+    }
     .pdf-new-btn {
       background: #E30613; border: none; border-radius: 8px;
       color: #fff; font-weight: 700; font-size: 14px;
@@ -763,8 +772,77 @@ hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
       window.scrollTo(0,0);
     }
 
+    let currentDocHtml = "";
+    let currentNom = "";
+
     function closePdfOverlay() {
       document.getElementById("pdfOverlay").classList.remove("visible");
+    }
+
+    async function sharePdf() {
+      // Try Web Share API first (iOS 15+)
+      if (navigator.share) {
+        try {
+          // Build PDF blob
+          const n = document.getElementById("nom").value.trim();
+          const dateVal = document.getElementById("datePaiement").value;
+          const nature = document.getElementById("nature").value;
+          const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
+          const lieu = document.getElementById("lieu").value.trim();
+          const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
+          const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
+          const lieuDate = lieu ? today+", "+lieu : today;
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"a4" });
+          const W = 210, margin = 20, contentW = W - margin * 2;
+          doc.setFillColor(227,6,19); doc.rect(0,0,W,5,"F");
+          doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(227,6,19);
+          doc.text("KOMPAN", W/2, 18, {align:"center", charSpace:3});
+          doc.setFontSize(14); doc.setTextColor(26,26,26);
+          doc.text("ATTESTATION SUR L'HONNEUR", W/2, 27, {align:"center"});
+          doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(136,136,136);
+          doc.text("Note de frais", W/2, 33, {align:"center"});
+          doc.setDrawColor(220,220,220); doc.line(margin, 38, W-margin, 38);
+          let y = 50;
+          doc.setTextColor(26,26,26); doc.setFontSize(11);
+          const lines = [
+            ["Je soussigné(e) : ", n],
+            ["Date du paiement : ", datePay],
+            ["Nature de la dépense : ", nature],
+            ["Montant TTC : ", montant + " €"],
+          ];
+          for (const [label, val] of lines) {
+            doc.setFont("helvetica","bold"); doc.text(label, margin, y);
+            const lw = doc.getTextWidth(label);
+            doc.setFont("helvetica","normal");
+            const wrapped = doc.splitTextToSize(val, contentW - lw);
+            doc.text(wrapped, margin+lw, y); y += 8 * wrapped.length;
+          }
+          y += 6; doc.setFont("helvetica","italic"); doc.setFontSize(10); doc.setTextColor(100,100,100);
+          doc.text("Fait pour servir et valoir ce que de droit.", margin, y);
+          y += 10; doc.setDrawColor(220,220,220); doc.line(margin, y, W-margin, y); y += 10;
+          doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(26,26,26);
+          doc.text("Date et lieu :", margin, y); doc.setFont("helvetica","normal"); doc.text(lieuDate, margin, y+6);
+          doc.setFont("helvetica","bold"); doc.text("Signature :", W-margin-55, y);
+          if (signatureData) { try { doc.addImage(signatureData,"PNG",W-margin-55,y+3,55,22); } catch(e){} }
+          doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(180,180,180);
+          doc.text("MADE BY ROMGER  ·  KOMPAN © " + new Date().getFullYear() + " — Usage interne", W/2, 285, {align:"center"});
+
+          const pdfBlob = doc.output("blob");
+          const file = new File([pdfBlob], "Attestation_KOMPAN_" + n.replace(/\s+/g,"_") + ".pdf", {type:"application/pdf"});
+
+          await navigator.share({ files: [file], title: "Attestation KOMPAN" });
+          return;
+        } catch(e) {
+          console.log("Share failed:", e);
+        }
+      }
+      // Fallback: direct download
+      const { jsPDF } = window.jspdf;
+      const n = document.getElementById("nom").value.trim();
+      // rebuild and save
+      alert("Utilisez le bouton ··· en haut à droite de Safari pour enregistrer la page en PDF.");
     }
 
     // ── RESET ──
@@ -795,7 +873,7 @@ hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
       <iframe id="pdfIframe" srcdoc="" style="width:100%;height:calc(100vh - 130px);border:none;background:#fff;display:block;"></iframe>
     </div>
     <div class="pdf-hint">
-      <p>Appuyez sur <strong>Partager ↗</strong> (bas de Safari) → <strong>Enregistrer en PDF</strong> 📥</p>
+      <button class="pdf-share-btn" onclick="sharePdf()" id="shareBtn">↗ Partager / Enregistrer</button>
       <button class="pdf-new-btn" onclick="closePdfOverlay(); reset();">+ Nouvelle attestation</button>
     </div>
   </div>
