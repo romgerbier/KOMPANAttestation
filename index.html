@@ -12,7 +12,36 @@
   <meta name="theme-color" content="#111111"/>
 
   <!-- Icône iOS (K blanc fond vert) inline SVG → PNG base64 -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMTgwIDE4MCI+CiAgPHJlY3Qgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIHJ4PSIzOCIgZmlsbD0iIzJFN0QzMiIvPgogIDx0ZXh0IHg9IjkwIiB5PSIxMzIiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjaywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1zaXplPSIxMDgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5LPC90ZXh0Pgo8L3N2Zz4="/>
+  <link rel="apple-touch-icon" id="appIcon" href=""/>
+  <script>
+    (function(){
+      var c = document.createElement("canvas");
+      c.width = 180; c.height = 180;
+      var ctx = c.getContext("2d");
+      // Green rounded rect
+      var r = 38;
+      ctx.beginPath();
+      ctx.moveTo(r, 0); ctx.lineTo(180-r, 0);
+      ctx.quadraticCurveTo(180, 0, 180, r);
+      ctx.lineTo(180, 180-r);
+      ctx.quadraticCurveTo(180, 180, 180-r, 180);
+      ctx.lineTo(r, 180);
+      ctx.quadraticCurveTo(0, 180, 0, 180-r);
+      ctx.lineTo(0, r);
+      ctx.quadraticCurveTo(0, 0, r, 0);
+      ctx.closePath();
+      ctx.fillStyle = "#2E7D32";
+      ctx.fill();
+      // White K
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 108px Arial Black, Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("K", 90, 95);
+      var dataUrl = c.toDataURL("image/png");
+      document.getElementById("appIcon").href = dataUrl;
+    })();
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -699,7 +728,7 @@
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(180, 180, 180);
-      doc.text("MADE BY ROMGER  ·  KOMPAN © " + new Date().getFullYear() + " — Usage interne", W / 2, 285, { align: "center" });
+      // footer removed
 
       // Save
       // Show PDF inline as base64 in a fullscreen overlay
@@ -737,7 +766,7 @@ hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
 .bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}
 .sig-lbl{font-size:11px;color:#888;margin-bottom:4px;text-align:right}
 .sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block;margin-left:auto}
-.footer{margin-top:40px;border-top:1px solid #eee;padding-top:10px;text-align:center;font-size:9px;color:#bbb;letter-spacing:.1em}
+
 </style></head><body>
 <div class="bar"></div>
 <div class="hdr">
@@ -758,11 +787,10 @@ hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
 <div class="bottom">
   <div style="font-size:13px"><strong>Date et lieu :</strong><br/>${lieuDate}</div>
   <div>
-    <div class="sig-lbl">Signature</div>
+    <div class="sig-lbl">Signature :</div>
     <img src="${signatureData}" class="sig-img" alt="Signature"/>
   </div>
 </div>
-<div class="footer">MADE BY ROMGER &nbsp;&middot;&nbsp; KOMPAN &copy; ${year} &mdash; Usage interne</div>
 </body></html>`;
 
       const iframe = document.getElementById("pdfIframe");
@@ -827,7 +855,7 @@ hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
           doc.setFont("helvetica","bold"); doc.text("Signature :", W-margin-55, y);
           if (signatureData) { try { doc.addImage(signatureData,"PNG",W-margin-55,y+3,55,22); } catch(e){} }
           doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(180,180,180);
-          doc.text("MADE BY ROMGER  ·  KOMPAN © " + new Date().getFullYear() + " — Usage interne", W/2, 285, {align:"center"});
+          // footer removed
 
           const pdfBlob = doc.output("blob");
           const file = new File([pdfBlob], "Attestation_KOMPAN_" + n.replace(/\s+/g,"_") + ".pdf", {type:"application/pdf"});
