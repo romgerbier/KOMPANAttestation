@@ -43,7 +43,6 @@
     })();
   </script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -630,132 +629,64 @@
 
     // ── DOWNLOAD PDF ──
     function telecharger() {
-      const nom = document.getElementById("nom").value.trim();
+      const n = document.getElementById("nom").value.trim();
       const dateVal = document.getElementById("datePaiement").value;
       const nature = document.getElementById("nature").value;
       const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
       const lieu = document.getElementById("lieu").value.trim();
-      const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
-      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "";
-      const lieuDate = lieu ? today + ", " + lieu : today;
+      const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
+      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
+      const lieuDate = lieu ? today+", "+lieu : today;
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      // Build the document using same reliable d.write approach
+      const iframe = document.getElementById("pdfIframe");
+      iframe.src = "about:blank";
 
-      const W = 210, margin = 20, contentW = W - margin * 2;
+      setTimeout(function() {
+        const d = iframe.contentDocument;
+        d.open();
+        d.write("<!DOCTYPE html><html><head><meta charset=UTF-8>");
+        d.write("<style>");
+        d.write("*{margin:0;padding:0;box-sizing:border-box}");
+        d.write("body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:40px 32px;max-width:680px;margin:0 auto}");
+        d.write(".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}");
+        d.write(".hdr{text-align:center;margin-bottom:22px}");
+        d.write(".brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:#E30613;margin-bottom:7px}");
+        d.write("h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}");
+        d.write(".sub{font-size:12px;color:#888}");
+        d.write("hr{border:none;border-top:1px solid #ddd;margin:18px 0}");
+        d.write("p{font-size:14px;line-height:1.8;margin-bottom:8px}");
+        d.write(".mention{font-style:italic;color:#555;font-size:13px;margin:16px 0}");
+        d.write(".bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}");
+        d.write(".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}");
+        d.write(".sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}");
+        d.write("@media print{.no-print{display:none!important}body{padding:20px}@page{margin:1cm}}");
+        d.write("</style></head><body>");
+        d.write("<div class=bar></div>");
+        d.write("<div class=hdr>");
+        d.write("<div class=brand>K O M P A N</div>");
+        d.write("<h1>Attestation sur l’Honneur</h1>");
+        d.write("<div class=sub>Note de frais</div>");
+        d.write("</div><hr>");
+        d.write("<p>Je soussigné(e) : <strong><u>" + n + "</u></strong></p>");
+        d.write("<p>Atteste sur l’honneur, avoir effectué une dépense pour le compte de l’entreprise <strong>KOMPAN</strong>.</p>");
+        d.write("<p><strong>Date du paiement :</strong> " + datePay + "</p>");
+        d.write("<p><strong>Nature de la dépense :</strong> " + nature + "</p>");
+        d.write("<p><strong>Montant TTC :</strong> " + montant + " €</p>");
+        d.write("<p class=mention>Fait pour servir et valoir ce que de droit.</p>");
+        d.write("<hr>");
+        d.write("<div class=bottom>");
+        d.write("<div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>");
+        d.write("<div><div class=sig-lbl>Signature :</div>");
+        d.write("<img src='" + signatureData + "' class=sig-img alt=Signature></div>");
+        d.write("</div>");
+        d.write("</body></html>");
+        d.close();
+      }, 80);
 
-      // Red top bar
-      doc.setFillColor(227, 6, 19);
-      doc.rect(0, 0, W, 5, "F");
-
-      // KOMPAN brand
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      doc.setTextColor(227, 6, 19);
-      doc.text("KOMPAN", W / 2, 18, { align: "center", charSpace: 3 });
-
-      // Title
-      doc.setFontSize(14);
-      doc.setTextColor(26, 26, 26);
-      doc.text("ATTESTATION SUR L'HONNEUR", W / 2, 27, { align: "center" });
-
-      // Subtitle
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(136, 136, 136);
-      doc.text("Note de frais", W / 2, 33, { align: "center" });
-
-      // Separator line
-      doc.setDrawColor(220, 220, 220);
-      doc.line(margin, 38, W - margin, 38);
-
-      // Body text
-      let y = 50;
-      doc.setTextColor(26, 26, 26);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-
-      // Line 1: Je soussigné(e)
-      doc.setFont("helvetica", "bold");
-      doc.text("Je soussigne(e) : ", margin, y);
-      var lw1 = doc.getTextWidth("Je soussigne(e) : ");
-      doc.setFont("helvetica", "normal");
-      doc.text(nom, margin + lw1, y);
-      y += 9;
-
-      // Line 2: Atteste sur l'honneur (full sentence, wrapped)
-      doc.setFont("helvetica", "normal");
-      var attesteTxt = "Atteste sur l'honneur, avoir effectue une depense pour le compte de l'entreprise KOMPAN.";
-      var attesteLines = doc.splitTextToSize(attesteTxt, contentW);
-      doc.text(attesteLines, margin, y);
-      y += 7 * attesteLines.length + 2;
-
-      // Line 3: Date du paiement
-      doc.setFont("helvetica", "bold");
-      doc.text("Date du paiement : ", margin, y);
-      var lw3 = doc.getTextWidth("Date du paiement : ");
-      doc.setFont("helvetica", "normal");
-      doc.text(datePay, margin + lw3, y);
-      y += 9;
-
-      // Line 4: Nature de la depense (wrapped)
-      doc.setFont("helvetica", "bold");
-      doc.text("Nature de la depense : ", margin, y);
-      var lw4 = doc.getTextWidth("Nature de la depense : ");
-      doc.setFont("helvetica", "normal");
-      var natLines = doc.splitTextToSize(nature, contentW - lw4);
-      doc.text(natLines, margin + lw4, y);
-      y += 7 * natLines.length + 2;
-
-      // Line 5: Montant TTC
-      doc.setFont("helvetica", "bold");
-      doc.text("Montant TTC : ", margin, y);
-      var lw5 = doc.getTextWidth("Montant TTC : ");
-      doc.setFont("helvetica", "normal");
-      doc.text(montant + " EUR", margin + lw5, y);
-      y += 12;
-
-      // Mention italic
-      doc.setFont("helvetica", "italic");
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text("Fait pour servir et valoir ce que de droit.", margin, y);
-
-      // Separator
-      y += 10;
-      doc.setDrawColor(220, 220, 220);
-      doc.line(margin, y, W - margin, y);
-      y += 10;
-
-      // Date & lieu
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.setTextColor(26, 26, 26);
-      doc.text("Date et lieu :", margin, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(lieuDate, margin, y + 6);
-
-      // Signature label
-      doc.setFont("helvetica", "bold");
-      doc.text("Signature :", W - margin - 55, y);
-
-      // Signature image
-      if (signatureData) {
-        try {
-          doc.addImage(signatureData, "PNG", W - margin - 55, y + 3, 55, 22);
-        } catch(e) {}
-      }
-
-      // Footer
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(180, 180, 180);
-      // footer removed
-
-      // Save
-      // Show PDF inline as base64 in a fullscreen overlay
-      const pdfBase64 = doc.output("datauristring");
-      showPdfOverlay(pdfBase64, nom);
+      document.getElementById("pdfOverlay").classList.add("visible");
+      document.getElementById("successBox").classList.remove("hidden");
+      window.scrollTo(0,0);
     }
 
 
@@ -823,69 +754,66 @@
     }
 
     async function sharePdf() {
-      // Try Web Share API first (iOS 15+)
-      if (navigator.share) {
-        try {
-          // Build PDF blob
-          const n = document.getElementById("nom").value.trim();
-          const dateVal = document.getElementById("datePaiement").value;
-          const nature = document.getElementById("nature").value;
-          const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
-          const lieu = document.getElementById("lieu").value.trim();
-          const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
-          const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
-          const lieuDate = lieu ? today+", "+lieu : today;
-
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"a4" });
-          const W = 210, margin = 20, contentW = W - margin * 2;
-          doc.setFillColor(227,6,19); doc.rect(0,0,W,5,"F");
-          doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(227,6,19);
-          doc.text("KOMPAN", W/2, 18, {align:"center", charSpace:3});
-          doc.setFontSize(14); doc.setTextColor(26,26,26);
-          doc.text("ATTESTATION SUR L'HONNEUR", W/2, 27, {align:"center"});
-          doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(136,136,136);
-          doc.text("Note de frais", W/2, 33, {align:"center"});
-          doc.setDrawColor(220,220,220); doc.line(margin, 38, W-margin, 38);
-          let y = 50;
-          doc.setTextColor(26,26,26); doc.setFontSize(11);
-          const lines = [
-            ["Je soussigné(e) : ", n],
-            ["Date du paiement : ", datePay],
-            ["Nature de la dépense : ", nature],
-            ["Montant TTC : ", montant + " €"],
-          ];
-          for (const [label, val] of lines) {
-            doc.setFont("helvetica","bold"); doc.text(label, margin, y);
-            const lw = doc.getTextWidth(label);
-            doc.setFont("helvetica","normal");
-            const wrapped = doc.splitTextToSize(val, contentW - lw);
-            doc.text(wrapped, margin+lw, y); y += 8 * wrapped.length;
-          }
-          y += 6; doc.setFont("helvetica","italic"); doc.setFontSize(10); doc.setTextColor(100,100,100);
-          doc.text("Fait pour servir et valoir ce que de droit.", margin, y);
-          y += 10; doc.setDrawColor(220,220,220); doc.line(margin, y, W-margin, y); y += 10;
-          doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(26,26,26);
-          doc.text("Date et lieu :", margin, y); doc.setFont("helvetica","normal"); doc.text(lieuDate, margin, y+6);
-          doc.setFont("helvetica","bold"); doc.text("Signature :", W-margin-55, y);
-          if (signatureData) { try { doc.addImage(signatureData,"PNG",W-margin-55,y+3,55,22); } catch(e){} }
-          doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(180,180,180);
-          // footer removed
-
-          const pdfBlob = doc.output("blob");
-          const file = new File([pdfBlob], "Attestation_KOMPAN_" + n.replace(/\s+/g,"_") + ".pdf", {type:"application/pdf"});
-
-          await navigator.share({ files: [file], title: "Attestation KOMPAN" });
-          return;
-        } catch(e) {
-          console.log("Share failed:", e);
-        }
-      }
-      // Fallback: direct download
-      const { jsPDF } = window.jspdf;
       const n = document.getElementById("nom").value.trim();
-      // rebuild and save
-      alert("Utilisez le bouton ··· en haut à droite de Safari pour enregistrer la page en PDF.");
+      const dateVal = document.getElementById("datePaiement").value;
+      const nature = document.getElementById("nature").value;
+      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
+      const lieu = document.getElementById("lieu").value.trim();
+      const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
+      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
+      const lieuDate = lieu ? today+", "+lieu : today;
+
+      // Build full standalone HTML page and open in new Safari tab
+      // User can then use Share > Save as PDF natively
+      var html = "<!DOCTYPE html><html><head><meta charset=UTF-8>";
+      html += "<meta name=viewport content='width=device-width,initial-scale=1'>";
+      html += "<title>Attestation KOMPAN - " + n + "</title>";
+      html += "<style>";
+      html += "*{margin:0;padding:0;box-sizing:border-box}";
+      html += "body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:40px 32px;max-width:680px;margin:0 auto}";
+      html += ".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}";
+      html += ".hdr{text-align:center;margin-bottom:22px}";
+      html += ".brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:#E30613;margin-bottom:7px}";
+      html += "h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}";
+      html += ".sub{font-size:12px;color:#888}";
+      html += "hr{border:none;border-top:1px solid #ddd;margin:18px 0}";
+      html += "p{font-size:14px;line-height:1.8;margin-bottom:8px}";
+      html += ".mention{font-style:italic;color:#555;font-size:13px;margin:16px 0}";
+      html += ".bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}";
+      html += ".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}";
+      html += ".sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}";
+      html += "</style></head><body>";
+      html += "<div class=bar></div>";
+      html += "<div class=hdr>";
+      html += "<div class=brand>K O M P A N</div>";
+      html += "<h1>Attestation sur l’Honneur</h1>";
+      html += "<div class=sub>Note de frais</div>";
+      html += "</div><hr>";
+      html += "<p>Je soussigné(e) : <strong><u>" + n + "</u></strong></p>";
+      html += "<p>Atteste sur l’honneur, avoir effectué une dépense pour le compte de l’entreprise <strong>KOMPAN</strong>.</p>";
+      html += "<p><strong>Date du paiement :</strong> " + datePay + "</p>";
+      html += "<p><strong>Nature de la dépense :</strong> " + nature + "</p>";
+      html += "<p><strong>Montant TTC :</strong> " + montant + " €</p>";
+      html += "<p class=mention>Fait pour servir et valoir ce que de droit.</p>";
+      html += "<hr>";
+      html += "<div class=bottom>";
+      html += "<div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>";
+      html += "<div><div class=sig-lbl>Signature :</div>";
+      html += "<img src='" + signatureData + "' class=sig-img alt=Signature></div>";
+      html += "</div></body></html>";
+
+      // Open in new tab - user saves as PDF from Safari
+      var w = window.open("", "_blank");
+      if (w) {
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
+      } else {
+        // Fallback: blob URL
+        var blob = new Blob([html], {type:"text/html;charset=utf-8"});
+        var url = URL.createObjectURL(blob);
+        window.location.href = url;
+      }
     }
 
     // ── RESET ──
