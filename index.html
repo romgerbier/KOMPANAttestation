@@ -30,7 +30,7 @@
       ctx.lineTo(0, r);
       ctx.quadraticCurveTo(0, 0, r, 0);
       ctx.closePath();
-      ctx.fillStyle = "#2E7D32";
+      ctx.fillStyle = "#E67E00";
       ctx.fill();
       // White K
       ctx.fillStyle = "#ffffff";
@@ -794,7 +794,18 @@ hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
 </body></html>`;
 
       const iframe = document.getElementById("pdfIframe");
-      iframe.srcdoc = docHtml;
+      // Use document.write - more reliable than srcdoc on iOS
+      iframe.onload = null;
+      iframe.src = "about:blank";
+      setTimeout(function() {
+        try {
+          iframe.contentDocument.open();
+          iframe.contentDocument.write(docHtml);
+          iframe.contentDocument.close();
+        } catch(e) {
+          iframe.srcdoc = docHtml;
+        }
+      }, 50);
       document.getElementById("pdfOverlay").classList.add("visible");
       document.getElementById("successBox").classList.remove("hidden");
       window.scrollTo(0,0);
