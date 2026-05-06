@@ -763,57 +763,49 @@
       const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
       const lieuDate = lieu ? today+", "+lieu : today;
 
-      // Build full standalone HTML page and open in new Safari tab
-      // User can then use Share > Save as PDF natively
-      var html = "<!DOCTYPE html><html><head><meta charset=UTF-8>";
-      html += "<meta name=viewport content='width=device-width,initial-scale=1'>";
-      html += "<title>Attestation KOMPAN - " + n + "</title>";
-      html += "<style>";
-      html += "*{margin:0;padding:0;box-sizing:border-box}";
-      html += "body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:40px 32px;max-width:680px;margin:0 auto}";
-      html += ".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}";
-      html += ".hdr{text-align:center;margin-bottom:22px}";
+      // Build HTML string
+      var html = "<!DOCTYPE html><html><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Attestation KOMPAN</title><style>";
+      html += "*{margin:0;padding:0;box-sizing:border-box}body{font-family:Georgia,serif;color:#1a1a1a;padding:40px 32px;max-width:680px;margin:0 auto}";
+      html += ".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}.hdr{text-align:center;margin-bottom:22px}";
       html += ".brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:#E30613;margin-bottom:7px}";
-      html += "h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}";
-      html += ".sub{font-size:12px;color:#888}";
-      html += "hr{border:none;border-top:1px solid #ddd;margin:18px 0}";
-      html += "p{font-size:14px;line-height:1.8;margin-bottom:8px}";
+      html += "h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}.sub{font-size:12px;color:#888}";
+      html += "hr{border:none;border-top:1px solid #ddd;margin:18px 0}p{font-size:14px;line-height:1.8;margin-bottom:8px}";
       html += ".mention{font-style:italic;color:#555;font-size:13px;margin:16px 0}";
       html += ".bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}";
-      html += ".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}";
-      html += ".sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}";
+      html += ".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}.sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}";
       html += "</style></head><body>";
-      html += "<div class=bar></div>";
-      html += "<div class=hdr>";
-      html += "<div class=brand>K O M P A N</div>";
-      html += "<h1>Attestation sur l’Honneur</h1>";
-      html += "<div class=sub>Note de frais</div>";
-      html += "</div><hr>";
+      html += "<div class=bar></div><div class=hdr><div class=brand>K O M P A N</div>";
+      html += "<h1>Attestation sur l’Honneur</h1><div class=sub>Note de frais</div></div><hr>";
       html += "<p>Je soussigné(e) : <strong><u>" + n + "</u></strong></p>";
       html += "<p>Atteste sur l’honneur, avoir effectué une dépense pour le compte de l’entreprise <strong>KOMPAN</strong>.</p>";
       html += "<p><strong>Date du paiement :</strong> " + datePay + "</p>";
       html += "<p><strong>Nature de la dépense :</strong> " + nature + "</p>";
       html += "<p><strong>Montant TTC :</strong> " + montant + " €</p>";
-      html += "<p class=mention>Fait pour servir et valoir ce que de droit.</p>";
-      html += "<hr>";
-      html += "<div class=bottom>";
-      html += "<div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>";
-      html += "<div><div class=sig-lbl>Signature :</div>";
-      html += "<img src='" + signatureData + "' class=sig-img alt=Signature></div>";
-      html += "</div></body></html>";
+      html += "<p class=mention>Fait pour servir et valoir ce que de droit.</p><hr>";
+      html += "<div class=bottom><div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>";
+      html += "<div><div class=sig-lbl>Signature :</div><img src='" + signatureData + "' class=sig-img></div></div>";
+      html += "</body></html>";
 
-      // Open in new tab - user saves as PDF from Safari
-      var w = window.open("", "_blank");
-      if (w) {
-        w.document.open();
-        w.document.write(html);
-        w.document.close();
-      } else {
-        // Fallback: blob URL
-        var blob = new Blob([html], {type:"text/html;charset=utf-8"});
-        var url = URL.createObjectURL(blob);
-        window.location.href = url;
-      }
+      // Share as HTML file using Web Share API - works in PWA fullscreen mode
+      try {
+        var blob = new Blob([html], {type: "text/html"});
+        var file = new File([blob], "Attestation_KOMPAN_" + n.replace(/\s+/g,"_") + ".html", {type: "text/html"});
+        if (navigator.canShare && navigator.canShare({files:[file]})) {
+          await navigator.share({files:[file], title:"Attestation KOMPAN - " + n});
+          return;
+        }
+      } catch(e) { console.log(e); }
+
+      // Fallback: download the file
+      try {
+        var blob2 = new Blob([html], {type: "text/html"});
+        var url = URL.createObjectURL(blob2);
+        var a = document.createElement("a");
+        a.href = url; a.download = "Attestation_KOMPAN_" + n.replace(/\s+/g,"_") + ".html";
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch(e2) { alert("Utilisez Safari (hors mode plein écran) pour enregistrer le document."); }
     }
 
     // ── RESET ──
