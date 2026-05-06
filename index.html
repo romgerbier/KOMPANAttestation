@@ -675,25 +675,47 @@
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
 
-      const lines = [
-        ["Je soussigné(e) : ", nom],
-        ["Date du paiement : ", datePay],
-        ["Nature de la dépense : ", nature],
-        ["Montant TTC : ", montant + " €"],
-      ];
+      // Line 1: Je soussigné(e)
+      doc.setFont("helvetica", "bold");
+      doc.text("Je soussigne(e) : ", margin, y);
+      var lw1 = doc.getTextWidth("Je soussigne(e) : ");
+      doc.setFont("helvetica", "normal");
+      doc.text(nom, margin + lw1, y);
+      y += 9;
 
-      for (const [label, val] of lines) {
-        doc.setFont("helvetica", "bold");
-        doc.text(label, margin, y);
-        const labelW = doc.getTextWidth(label);
-        doc.setFont("helvetica", "normal");
-        // wrap long values
-        const wrapped = doc.splitTextToSize(val, contentW - labelW);
-        doc.text(wrapped, margin + labelW, y);
-        y += 8 * wrapped.length;
-      }
+      // Line 2: Atteste sur l'honneur (full sentence, wrapped)
+      doc.setFont("helvetica", "normal");
+      var attesteTxt = "Atteste sur l'honneur, avoir effectue une depense pour le compte de l'entreprise KOMPAN.";
+      var attesteLines = doc.splitTextToSize(attesteTxt, contentW);
+      doc.text(attesteLines, margin, y);
+      y += 7 * attesteLines.length + 2;
 
-      y += 6;
+      // Line 3: Date du paiement
+      doc.setFont("helvetica", "bold");
+      doc.text("Date du paiement : ", margin, y);
+      var lw3 = doc.getTextWidth("Date du paiement : ");
+      doc.setFont("helvetica", "normal");
+      doc.text(datePay, margin + lw3, y);
+      y += 9;
+
+      // Line 4: Nature de la depense (wrapped)
+      doc.setFont("helvetica", "bold");
+      doc.text("Nature de la depense : ", margin, y);
+      var lw4 = doc.getTextWidth("Nature de la depense : ");
+      doc.setFont("helvetica", "normal");
+      var natLines = doc.splitTextToSize(nature, contentW - lw4);
+      doc.text(natLines, margin + lw4, y);
+      y += 7 * natLines.length + 2;
+
+      // Line 5: Montant TTC
+      doc.setFont("helvetica", "bold");
+      doc.text("Montant TTC : ", margin, y);
+      var lw5 = doc.getTextWidth("Montant TTC : ");
+      doc.setFont("helvetica", "normal");
+      doc.text(montant + " EUR", margin + lw5, y);
+      y += 12;
+
+      // Mention italic
       doc.setFont("helvetica", "italic");
       doc.setFontSize(10);
       doc.setTextColor(100, 100, 100);
