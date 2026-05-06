@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>KOMPANAttestation</title>
+
+  <!-- PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="KOMPANAttestation"/>
+  <meta name="theme-color" content="#111111"/>
+
+  <!-- Icône iOS (K blanc fond vert) inline SVG → PNG base64 -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%232E7D32'/%3E%3Ctext x='90' y='128' font-family='Arial Black,sans-serif' font-weight='900' font-size='110' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E"/>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #E30613;
+      --bg: #111111;
+      --card: #1E1E1E;
+      --card2: #252525;
+      --border: #333333;
+      --text: #FFFFFF;
+      --muted: #888888;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--bg);
+      border-bottom: 2px solid var(--red);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-inner {
+      max-width: 640px; margin: 0 auto;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo {
+      font-family: Arial Black, sans-serif;
+      font-weight: 900; font-size: 22px;
+      color: var(--red); letter-spacing: 0.02em;
+    }
+    .divider { width: 1px; height: 34px; background: var(--border); flex-shrink: 0; }
+    .header-title { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .header-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .header-sub span { color: var(--red); font-weight: 800; }
+
+    /* CONTENT */
+    .content { max-width: 640px; margin: 0 auto; padding: 0 20px; }
+
+    /* STEPS */
+    .steps { display: flex; margin: 22px 0 26px; }
+    .step { flex: 1; text-align: center; position: relative; }
+    .step-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 13px;
+      margin: 0 auto 7px;
+      border: 2px solid var(--border);
+      background: #1a1a1a; color: #444;
+      transition: all 0.3s;
+    }
+    .step-circle.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .step-circle.done { background: #2a2a2a; color: var(--red); }
+    .step-label { font-size: 10px; font-weight: 500; color: #444; text-transform: uppercase; letter-spacing: 0.06em; }
+    .step-label.active { color: var(--text); font-weight: 700; }
+    .step-line {
+      position: absolute; top: 15px;
+      left: calc(50% + 18px); right: calc(-50% + 18px);
+      height: 1px; background: var(--border); transition: background 0.3s;
+    }
+    .step-line.done { background: var(--red); }
+
+    /* CARD */
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 26px 22px 22px;
+      border: 1px solid var(--border);
+    }
+
+    /* FIELDS */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-weight: 700; font-size: 11px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 7px;
+    }
+    .field label .req { color: var(--red); margin-left: 3px; }
+    .field input, .field select {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 15px; font-family: inherit;
+      color: var(--text); background: var(--card2);
+      outline: none; transition: border 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(227,6,19,0.15);
+    }
+    .field .hint { color: #444; font-size: 11px; margin-top: 5px; }
+    .field .error { color: var(--red); font-size: 12px; margin-top: 4px; }
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+      cursor: pointer;
+    }
+    option { background: #252525; color: #fff; }
+
+    /* BUTTONS */
+    .btn-primary {
+      width: 100%; padding: 13px 0;
+      background: var(--red); border: none; border-radius: 9px;
+      font-weight: 800; font-size: 15px; font-family: inherit;
+      color: #fff; cursor: pointer; letter-spacing: 0.04em;
+      margin-top: 4px; transition: opacity 0.2s;
+    }
+    .btn-primary:active { opacity: 0.85; }
+    .btn-primary:disabled { background: #2a2a2a; color: #444; cursor: not-allowed; }
+    .btn-back {
+      flex: 1; padding: 12px 0;
+      background: transparent; border: 1.5px solid var(--border);
+      border-radius: 8px; font-family: inherit;
+      cursor: pointer; color: var(--muted); font-weight: 600; font-size: 14px;
+    }
+    .btn-row { display: flex; gap: 10px; margin-top: 14px; }
+
+    /* SIGNATURE PAD */
+    .sig-canvas {
+      border: 1.5px dashed var(--border); border-radius: 10px;
+      background: #fff; cursor: crosshair;
+      width: 100%; touch-action: none; display: block;
+      max-height: 160px;
+    }
+    .sig-hint { font-size: 11px; color: var(--muted); text-align: center; margin: 6px 0; }
+    .sig-btns { display: flex; gap: 8px; }
+    .sig-clear {
+      flex: 1; padding: 9px 0; background: transparent;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--muted); font-family: inherit; cursor: pointer; font-size: 13px;
+    }
+    .sig-validate {
+      flex: 2; padding: 9px 0; background: #2a2a2a;
+      border: none; border-radius: 8px;
+      color: #555; font-family: inherit; font-weight: 700;
+      cursor: not-allowed; font-size: 13px; transition: all 0.2s;
+    }
+    .sig-validate.active { background: var(--red); color: #fff; cursor: pointer; }
+    .sig-preview {
+      border: 1.5px solid var(--red); border-radius: 10px; padding: 12px;
+      text-align: center; background: var(--card2); margin-bottom: 12px;
+    }
+    .sig-preview img { max-height: 100px; }
+    .sig-redo {
+      width: 100%; padding: 8px 0; background: transparent;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--muted); font-family: inherit; cursor: pointer;
+      font-size: 13px; margin-bottom: 14px;
+    }
+
+    /* PREVIEW DOCUMENT */
+    .doc-preview {
+      background: #fff; border: 2px solid var(--red);
+      border-radius: 12px; padding: 28px 24px;
+      font-family: Georgia, serif; color: #1a1a1a;
+      position: relative; overflow: hidden;
+    }
+    .doc-topbar {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 5px; background: var(--red);
+    }
+    .doc-header { text-align: center; margin-bottom: 20px; margin-top: 8px; }
+    .doc-brand {
+      font-family: Arial Black, sans-serif; font-weight: 900;
+      font-size: 11px; letter-spacing: 0.25em;
+      color: var(--red); margin-bottom: 6px;
+    }
+    .doc-title { font-weight: 700; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .doc-sub { font-size: 12px; color: #888; margin-top: 2px; }
+    .doc-body { font-size: 13px; line-height: 1.9; }
+    .doc-body p { margin-bottom: 4px; }
+    .doc-mention { font-style: italic; color: #555; font-size: 12px; margin-top: 12px; }
+    .doc-bottom {
+      display: flex; justify-content: space-between;
+      align-items: flex-end; margin-top: 20px;
+    }
+    .doc-date { font-size: 13px; }
+    .doc-sig-label { font-size: 11px; color: #888; margin-bottom: 4px; text-align: right; }
+    .doc-sig-img { height: 65px; border: 1px solid #eee; border-radius: 4px; background: #fff; display: block; margin-left: auto; }
+    .doc-sig-empty {
+      width: 130px; height: 55px; border: 1px dashed #ccc;
+      border-radius: 4px; display: flex; align-items: center;
+      justify-content: center; color: #bbb; font-size: 11px;
+    }
+
+    /* SUCCESS BOX */
+    .success-box {
+      text-align: center; background: var(--card);
+      border: 1.5px solid var(--red); border-radius: 12px;
+      padding: 18px 20px; margin-top: 16px;
+    }
+    .success-box h3 { font-weight: 700; margin-bottom: 8px; }
+    .success-box p { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+
+    /* FOOTER */
+    .footer {
+      text-align: center; padding: 28px 0 44px; margin-top: 8px;
+    }
+    .footer-inner { display: inline-block; border-top: 1px solid #2a2a2a; padding-top: 14px; }
+    .footer-made { font-size: 10px; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: #3a3a3a; }
+    .footer-copy { font-size: 10px; color: #2a2a2a; margin-top: 3px; letter-spacing: 0.05em; }
+
+    /* HIDDEN */
+    .hidden { display: none !important; }
+
+
+    /* PDF OVERLAY */
+    #pdfOverlay {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 10000;
+      background: #111;
+      flex-direction: column;
+    }
+    #pdfOverlay.visible { display: flex; }
+    .pdf-toolbar {
+      background: #1a1a1a;
+      border-bottom: 2px solid #E30613;
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .pdf-toolbar-title { font-weight: 700; font-size: 14px; color: #fff; }
+    .pdf-toolbar-sub { font-size: 11px; color: #888; margin-top: 2px; }
+    .pdf-close {
+      background: #333; border: none; border-radius: 8px;
+      color: #fff; font-size: 13px; padding: 8px 14px;
+      cursor: pointer; font-family: inherit; font-weight: 600;
+    }
+    .pdf-frame-wrap { flex: 1; overflow: auto; padding: 16px; }
+    .pdf-embed {
+      width: 100%; min-height: 80vh;
+      border: none; border-radius: 8px;
+      display: block;
+    }
+    .pdf-hint {
+      text-align: center; padding: 14px 20px;
+      background: #1a1a1a; border-top: 1px solid #333;
+      flex-shrink: 0;
+    }
+    .pdf-hint p { color: #888; font-size: 13px; margin-bottom: 10px; }
+    .pdf-new-btn {
+      background: #E30613; border: none; border-radius: 8px;
+      color: #fff; font-weight: 700; font-size: 14px;
+      padding: 11px 24px; cursor: pointer; font-family: inherit;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      input[type="date"] { color-scheme: dark; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo">KOMPAN</div>
+      <div class="divider"></div>
+      <div>
+        <div class="header-title">Attestation sur l'Honneur</div>
+        <div class="header-sub">Note de frais · <span>by ROMGER</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- STEPS -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-circle active" id="circle-1">1</div>
+        <div class="step-label active" id="label-1">Infos</div>
+        <div class="step-line" id="line-1"></div>
+      </div>
+      <div class="step">
+        <div class="step-circle" id="circle-2">2</div>
+        <div class="step-label" id="label-2">Signature</div>
+        <div class="step-line" id="line-2"></div>
+      </div>
+      <div class="step">
+        <div class="step-circle" id="circle-3">3</div>
+        <div class="step-label" id="label-3">Aperçu</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: FORM -->
+    <div class="card" id="step1">
+      <div class="field">
+        <label>Nom et prénom <span class="req">*</span></label>
+        <input type="text" id="nom" placeholder="Votre nom complet"/>
+        <div class="error hidden" id="err-nom">Champ requis</div>
+      </div>
+      <div class="field">
+        <label>Date du paiement <span class="req">*</span></label>
+        <input type="date" id="datePaiement" style="color-scheme:dark"/>
+        <div class="error hidden" id="err-date">Champ requis</div>
+      </div>
+      <div class="field">
+        <label>Nature de la dépense <span class="req">*</span></label>
+        <select id="nature">
+          <option value="">-- Sélectionner --</option>
+          <option>Achat petit matériel pour projets d'installation</option>
+          <option>Autres frais de personnel</option>
+          <option>Autres frais de véhicule</option>
+          <option>Déplacement, hôtel</option>
+          <option>Déplacement, repas individuel (midi ou soir)</option>
+          <option>Déplacements - Autres</option>
+          <option>Frais bancaires</option>
+          <option>Parking</option>
+          <option>Repas - Reunion, Formation, Autres (sans TVA)</option>
+          <option>Véhicule, Entretien camion ISA</option>
+          <option>Véhicule, carburant camion ISA</option>
+        </select>
+        <div class="error hidden" id="err-nature">Champ requis</div>
+      </div>
+      <div class="field">
+        <label>Montant TTC (€) <span class="req">*</span></label>
+        <input type="number" id="montant" placeholder="0.00" step="0.01" min="0"/>
+        <div class="error hidden" id="err-montant">Montant invalide</div>
+      </div>
+      <div class="field">
+        <label>Lieu de rédaction de l'attestation</label>
+        <input type="text" id="lieu" placeholder="Ex : Paris, Lyon..."/>
+        <div class="hint">📍 Ville depuis laquelle vous établissez cette attestation</div>
+      </div>
+      <button class="btn-primary" onclick="goStep2()">Suivant → Signature</button>
+    </div>
+
+    <!-- STEP 2: SIGNATURE -->
+    <div class="card hidden" id="step2">
+      <div style="margin-bottom:20px">
+        <div style="font-weight:700;font-size:16px;margin-bottom:5px">Votre signature</div>
+        <div style="color:var(--muted);font-size:13px">Signez dans le cadre ci-dessous.</div>
+      </div>
+
+      <div id="sig-pad-area">
+        <canvas id="sigCanvas" class="sig-canvas" width="500" height="160"></canvas>
+        <div class="sig-hint">Signez avec votre doigt ou votre souris</div>
+        <div class="sig-btns">
+          <button class="sig-clear" onclick="clearSig()">✕ Effacer</button>
+          <button class="sig-validate active" id="sigValidateBtn" onclick="validateSig()" style="flex:2;padding:9px 0;background:var(--red);border:none;border-radius:8px;color:#fff;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer">✓ Valider &amp; continuer</button>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn-back" onclick="goStep1()">← Retour</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PREVIEW -->
+    <div class="hidden" id="step3">
+      <!-- Document preview -->
+      <div class="doc-preview">
+        <div class="doc-topbar"></div>
+        <div class="doc-header">
+          <div class="doc-brand">KOMPAN</div>
+          <div class="doc-title">Attestation sur l'Honneur</div>
+          <div class="doc-sub">Note de frais</div>
+        </div>
+        <div class="doc-body">
+          <p>Je soussigné(e) : <strong><span id="pv-nom" style="border-bottom:1px solid #333;padding-bottom:1px"></span></strong></p>
+          <p>Atteste sur l'honneur, avoir effectué une dépense pour le compte de l'entreprise <strong>KOMPAN</strong>.</p>
+          <p><strong>Date du paiement :</strong> <span id="pv-date"></span></p>
+          <p><strong>Nature de la dépense :</strong> <span id="pv-nature"></span></p>
+          <p><strong>Montant TTC :</strong> <span id="pv-montant"></span></p>
+        </div>
+        <p class="doc-mention">Fait pour servir et valoir ce que de droit.</p>
+        <div class="doc-bottom">
+          <div class="doc-date">
+            <strong>Date et lieu :</strong><br/>
+            <span id="pv-lieu"></span>
+          </div>
+          <div>
+            <div class="doc-sig-label">Signature</div>
+            <img id="pv-sig" class="doc-sig-img hidden" src="" alt="Signature"/>
+            <div class="doc-sig-empty" id="pv-sig-empty">à signer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="btn-row" style="margin:18px 0">
+        <button class="btn-back" onclick="goStep2()">← Modifier</button>
+        <button class="btn-primary" onclick="telecharger()" style="flex:2;margin-top:0">📄 Générer le PDF</button>
+      </div>
+
+      <!-- Success box -->
+      <div class="success-box hidden" id="successBox">
+        <h3>✅ PDF généré !</h3>
+        <p>Le PDF s'affiche. Utilisez <strong>Partager ↗</strong> pour l'enregistrer.</p>
+        <button class="btn-primary" onclick="reset()" style="width:auto;padding:9px 24px;margin-top:10px">+ Nouvelle attestation</button>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-inner">
+        <div class="footer-made">MADE BY ROMGER</div>
+        <div class="footer-copy">KOMPAN © <span id="yr"></span> — Usage interne</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("yr").textContent = new Date().getFullYear();
+
+    // ── STATE ──
+    let signatureData = null;
+    let hasDrawn = false;
+    let drawing = false;
+    let lastX = 0, lastY = 0;
+    let currentStep = 1;
+
+    // ── CANVAS SETUP ──
+    const canvas = document.getElementById("sigCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function initCanvas() {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "#111111";
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      hasDrawn = false;
+      document.getElementById("sigValidateBtn").classList.remove("active");
+    }
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      if (e.touches) return {
+        x: (e.touches[0].clientX - rect.left) * scaleX,
+        y: (e.touches[0].clientY - rect.top) * scaleY
+      };
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+    }
+
+    canvas.addEventListener("mousedown", e => { drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
+    canvas.addEventListener("mousemove", e => {
+      if (!drawing) return;
+      const p = getPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+      lastX = p.x; lastY = p.y;
+      hasDrawn = true;
+      document.getElementById("sigValidateBtn").classList.add("active");
+    });
+    canvas.addEventListener("mouseup", () => drawing = false);
+    canvas.addEventListener("mouseleave", () => drawing = false);
+
+    canvas.addEventListener("touchstart", e => { e.preventDefault(); drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; }, { passive: false });
+    canvas.addEventListener("touchmove", e => {
+      e.preventDefault();
+      if (!drawing) return;
+      const p = getPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
+      lastX = p.x; lastY = p.y;
+      hasDrawn = true;
+      document.getElementById("sigValidateBtn").classList.add("active");
+    }, { passive: false });
+    canvas.addEventListener("touchend", e => { e.preventDefault(); drawing = false; }, { passive: false });
+
+    function clearSig() {
+      initCanvas();
+    }
+
+    function validateSig() {
+      if (!hasDrawn) {
+        document.getElementById("sigCanvas").style.border = "2px dashed #E30613";
+        setTimeout(() => document.getElementById("sigCanvas").style.border = "1.5px dashed var(--border)", 1000);
+        return;
+      }
+      signatureData = canvas.toDataURL("image/png");
+      goStep3();
+    }
+
+    // ── STEPS ──
+    function updateSteps(step) {
+      currentStep = step;
+      for (let i = 1; i <= 3; i++) {
+        const circle = document.getElementById("circle-" + i);
+        const label = document.getElementById("label-" + i);
+        circle.className = "step-circle" + (i === step ? " active" : i < step ? " done" : "");
+        circle.textContent = i < step ? "✓" : i;
+        if (label) label.className = "step-label" + (i === step ? " active" : "");
+        if (i < 3) {
+          const line = document.getElementById("line-" + i);
+          if (line) line.className = "step-line" + (i < step ? " done" : "");
+        }
+      }
+    }
+
+    function validate() {
+      let ok = true;
+      const nom = document.getElementById("nom").value.trim();
+      const date = document.getElementById("datePaiement").value;
+      const nature = document.getElementById("nature").value;
+      const montant = document.getElementById("montant").value;
+
+      document.getElementById("err-nom").classList.toggle("hidden", !!nom);
+      document.getElementById("err-date").classList.toggle("hidden", !!date);
+      document.getElementById("err-nature").classList.toggle("hidden", !!nature);
+      document.getElementById("err-montant").classList.toggle("hidden", !!(montant && !isNaN(montant)));
+
+      if (!nom || !date || !nature || !montant || isNaN(montant)) ok = false;
+      return ok;
+    }
+
+    function goStep1() {
+      document.getElementById("step1").classList.remove("hidden");
+      document.getElementById("step2").classList.add("hidden");
+      document.getElementById("step3").classList.add("hidden");
+      updateSteps(1);
+      window.scrollTo(0, 0);
+    }
+
+    function goStep2() {
+      if (currentStep === 1 && !validate()) return;
+      document.getElementById("step1").classList.add("hidden");
+      document.getElementById("step2").classList.remove("hidden");
+      document.getElementById("step3").classList.add("hidden");
+      updateSteps(2);
+      if (!signatureData) initCanvas();
+      window.scrollTo(0, 0);
+    }
+
+    function goStep3() {
+      if (!signatureData) {
+        document.getElementById("sig-warning").classList.remove("hidden");
+        return;
+      }
+      // Fill preview
+      const nom = document.getElementById("nom").value.trim();
+      const dateVal = document.getElementById("datePaiement").value;
+      const nature = document.getElementById("nature").value;
+      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
+      const lieu = document.getElementById("lieu").value.trim();
+      const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "";
+
+      document.getElementById("pv-nom").textContent = nom;
+      document.getElementById("pv-date").textContent = datePay;
+      document.getElementById("pv-nature").textContent = nature;
+      document.getElementById("pv-montant").textContent = montant + " €";
+      document.getElementById("pv-lieu").textContent = lieu ? today + ", " + lieu : today;
+
+      const sigImg = document.getElementById("pv-sig");
+      const sigEmpty = document.getElementById("pv-sig-empty");
+      sigImg.src = signatureData;
+      sigImg.classList.remove("hidden");
+      sigEmpty.classList.add("hidden");
+
+      document.getElementById("step1").classList.add("hidden");
+      document.getElementById("step2").classList.add("hidden");
+      document.getElementById("step3").classList.remove("hidden");
+      document.getElementById("successBox").classList.add("hidden");
+      updateSteps(3);
+      window.scrollTo(0, 0);
+    }
+
+    // ── DOWNLOAD PDF ──
+    function telecharger() {
+      const nom = document.getElementById("nom").value.trim();
+      const dateVal = document.getElementById("datePaiement").value;
+      const nature = document.getElementById("nature").value;
+      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
+      const lieu = document.getElementById("lieu").value.trim();
+      const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "";
+      const lieuDate = lieu ? today + ", " + lieu : today;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+      const W = 210, margin = 20, contentW = W - margin * 2;
+
+      // Red top bar
+      doc.setFillColor(227, 6, 19);
+      doc.rect(0, 0, W, 5, "F");
+
+      // KOMPAN brand
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(227, 6, 19);
+      doc.text("KOMPAN", W / 2, 18, { align: "center", charSpace: 3 });
+
+      // Title
+      doc.setFontSize(14);
+      doc.setTextColor(26, 26, 26);
+      doc.text("ATTESTATION SUR L'HONNEUR", W / 2, 27, { align: "center" });
+
+      // Subtitle
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(136, 136, 136);
+      doc.text("Note de frais", W / 2, 33, { align: "center" });
+
+      // Separator line
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, 38, W - margin, 38);
+
+      // Body text
+      let y = 50;
+      doc.setTextColor(26, 26, 26);
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+
+      const lines = [
+        ["Je soussigné(e) : ", nom],
+        ["Date du paiement : ", datePay],
+        ["Nature de la dépense : ", nature],
+        ["Montant TTC : ", montant + " €"],
+      ];
+
+      for (const [label, val] of lines) {
+        doc.setFont("helvetica", "bold");
+        doc.text(label, margin, y);
+        const labelW = doc.getTextWidth(label);
+        doc.setFont("helvetica", "normal");
+        // wrap long values
+        const wrapped = doc.splitTextToSize(val, contentW - labelW);
+        doc.text(wrapped, margin + labelW, y);
+        y += 8 * wrapped.length;
+      }
+
+      y += 6;
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text("Fait pour servir et valoir ce que de droit.", margin, y);
+
+      // Separator
+      y += 10;
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, y, W - margin, y);
+      y += 10;
+
+      // Date & lieu
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(26, 26, 26);
+      doc.text("Date et lieu :", margin, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(lieuDate, margin, y + 6);
+
+      // Signature label
+      doc.setFont("helvetica", "bold");
+      doc.text("Signature :", W - margin - 55, y);
+
+      // Signature image
+      if (signatureData) {
+        try {
+          doc.addImage(signatureData, "PNG", W - margin - 55, y + 3, 55, 22);
+        } catch(e) {}
+      }
+
+      // Footer
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(180, 180, 180);
+      doc.text("MADE BY ROMGER  ·  KOMPAN © " + new Date().getFullYear() + " — Usage interne", W / 2, 285, { align: "center" });
+
+      // Save
+      // Show PDF inline as base64 in a fullscreen overlay
+      const pdfBase64 = doc.output("datauristring");
+      showPdfOverlay(pdfBase64, nom);
+    }
+
+
+    function showPdfOverlay(dataUri, nom) {
+      // Build HTML doc and render in iframe - works on all iOS versions
+      const n = document.getElementById("nom").value.trim();
+      const dateVal = document.getElementById("datePaiement").value;
+      const nature = document.getElementById("nature").value;
+      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
+      const lieu = document.getElementById("lieu").value.trim();
+      const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
+      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
+      const lieuDate = lieu ? today+", "+lieu : today;
+      const year = new Date().getFullYear();
+
+      const docHtml = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:32px 28px;max-width:680px;margin:0 auto}
+.bar{background:#E30613;height:5px;margin-bottom:28px;margin-left:-28px;margin-right:-28px;margin-top:-32px}
+.hdr{text-align:center;margin-bottom:24px;margin-top:20px}
+.brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:10px;letter-spacing:.3em;color:#E30613;margin-bottom:6px}
+h1{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.sub{font-size:11px;color:#888}
+hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
+.body{font-size:14px;line-height:2}
+.body p{margin-bottom:4px}
+.mention{font-style:italic;color:#555;font-size:12px;margin:16px 0}
+.bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}
+.sig-lbl{font-size:11px;color:#888;margin-bottom:4px;text-align:right}
+.sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block;margin-left:auto}
+.footer{margin-top:40px;border-top:1px solid #eee;padding-top:10px;text-align:center;font-size:9px;color:#bbb;letter-spacing:.1em}
+</style></head><body>
+<div class="bar"></div>
+<div class="hdr">
+  <div class="brand">KOMPAN</div>
+  <h1>Attestation sur l&#x2019;Honneur</h1>
+  <div class="sub">Note de frais</div>
+</div>
+<hr/>
+<div class="body">
+  <p>Je soussign&#xE9;(e) : <strong><u>${n}</u></strong></p>
+  <p>Atteste sur l&#x2019;honneur, avoir effectu&#xE9; une d&#xE9;pense pour le compte de l&#x2019;entreprise <strong>KOMPAN</strong>.</p>
+  <p><strong>Date du paiement :</strong> ${datePay}</p>
+  <p><strong>Nature de la d&#xE9;pense :</strong> ${nature}</p>
+  <p><strong>Montant TTC :</strong> ${montant} &#x20AC;</p>
+</div>
+<p class="mention">Fait pour servir et valoir ce que de droit.</p>
+<hr/>
+<div class="bottom">
+  <div style="font-size:13px"><strong>Date et lieu :</strong><br/>${lieuDate}</div>
+  <div>
+    <div class="sig-lbl">Signature</div>
+    <img src="${signatureData}" class="sig-img" alt="Signature"/>
+  </div>
+</div>
+<div class="footer">MADE BY ROMGER &nbsp;&middot;&nbsp; KOMPAN &copy; ${year} &mdash; Usage interne</div>
+</body></html>`;
+
+      const iframe = document.getElementById("pdfIframe");
+      iframe.srcdoc = docHtml;
+      document.getElementById("pdfOverlay").classList.add("visible");
+      document.getElementById("successBox").classList.remove("hidden");
+      window.scrollTo(0,0);
+    }
+
+    function closePdfOverlay() {
+      document.getElementById("pdfOverlay").classList.remove("visible");
+    }
+
+    // ── RESET ──
+    function reset() {
+      document.getElementById("nom").value = "";
+      document.getElementById("datePaiement").value = "";
+      document.getElementById("nature").value = "";
+      document.getElementById("montant").value = "";
+      document.getElementById("lieu").value = "";
+      signatureData = null;
+      goStep1();
+    }
+
+    // Init
+    initCanvas();
+  </script>
+
+  <!-- PDF OVERLAY -->
+  <div id="pdfOverlay">
+    <div class="pdf-toolbar">
+      <div>
+        <div class="pdf-toolbar-title">📄 Attestation KOMPAN</div>
+        <div class="pdf-toolbar-sub">Appuyez sur Partager ↗ pour enregistrer</div>
+      </div>
+      <button class="pdf-close" onclick="closePdfOverlay()">✕ Fermer</button>
+    </div>
+    <div class="pdf-frame-wrap" style="padding:0">
+      <iframe id="pdfIframe" srcdoc="" style="width:100%;height:calc(100vh - 130px);border:none;background:#fff;display:block;"></iframe>
+    </div>
+    <div class="pdf-hint">
+      <p>Appuyez sur <strong>Partager ↗</strong> (bas de Safari) → <strong>Enregistrer en PDF</strong> 📥</p>
+      <button class="pdf-new-btn" onclick="closePdfOverlay(); reset();">+ Nouvelle attestation</button>
+    </div>
+  </div>
+
+</body>
+</html>
