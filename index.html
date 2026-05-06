@@ -30,7 +30,7 @@
       ctx.lineTo(0, r);
       ctx.quadraticCurveTo(0, 0, r, 0);
       ctx.closePath();
-      ctx.fillStyle = "#E67E00";
+      ctx.fillStyle = "#2E7D32";
       ctx.fill();
       // White K
       ctx.fillStyle = "#ffffff";
@@ -738,7 +738,6 @@
 
 
     function showPdfOverlay(dataUri, nom) {
-      // Build HTML doc and render in iframe - works on all iOS versions
       const n = document.getElementById("nom").value.trim();
       const dateVal = document.getElementById("datePaiement").value;
       const nature = document.getElementById("nature").value;
@@ -747,65 +746,48 @@
       const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
       const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
       const lieuDate = lieu ? today+", "+lieu : today;
-      const year = new Date().getFullYear();
 
-      const docHtml = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:32px 28px;max-width:680px;margin:0 auto}
-.bar{background:#E30613;height:5px;margin-bottom:28px;margin-left:-28px;margin-right:-28px;margin-top:-32px}
-.hdr{text-align:center;margin-bottom:24px;margin-top:20px}
-.brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:10px;letter-spacing:.3em;color:#E30613;margin-bottom:6px}
-h1{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
-.sub{font-size:11px;color:#888}
-hr{border:none;border-top:1px solid #e0e0e0;margin:18px 0}
-.body{font-size:14px;line-height:2}
-.body p{margin-bottom:4px}
-.mention{font-style:italic;color:#555;font-size:12px;margin:16px 0}
-.bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}
-.sig-lbl{font-size:11px;color:#888;margin-bottom:4px;text-align:right}
-.sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block;margin-left:auto}
-
-</style></head><body>
-<div class="bar"></div>
-<div class="hdr">
-  <div class="brand">KOMPAN</div>
-  <h1>Attestation sur l&#x2019;Honneur</h1>
-  <div class="sub">Note de frais</div>
-</div>
-<hr/>
-<div class="body">
-  <p>Je soussign&#xE9;(e) : <strong><u>${n}</u></strong></p>
-  <p>Atteste sur l&#x2019;honneur, avoir effectu&#xE9; une d&#xE9;pense pour le compte de l&#x2019;entreprise <strong>KOMPAN</strong>.</p>
-  <p><strong>Date du paiement :</strong> ${datePay}</p>
-  <p><strong>Nature de la d&#xE9;pense :</strong> ${nature}</p>
-  <p><strong>Montant TTC :</strong> ${montant} &#x20AC;</p>
-</div>
-<p class="mention">Fait pour servir et valoir ce que de droit.</p>
-<hr/>
-<div class="bottom">
-  <div style="font-size:13px"><strong>Date et lieu :</strong><br/>${lieuDate}</div>
-  <div>
-    <div class="sig-lbl">Signature :</div>
-    <img src="${signatureData}" class="sig-img" alt="Signature"/>
-  </div>
-</div>
-</body></html>`;
-
+      // Build DOM directly in iframe - no template literals, no encoding issues
       const iframe = document.getElementById("pdfIframe");
-      // Use document.write - more reliable than srcdoc on iOS
-      iframe.onload = null;
       iframe.src = "about:blank";
+
       setTimeout(function() {
-        try {
-          iframe.contentDocument.open();
-          iframe.contentDocument.write(docHtml);
-          iframe.contentDocument.close();
-        } catch(e) {
-          iframe.srcdoc = docHtml;
-        }
-      }, 50);
+        const d = iframe.contentDocument;
+        d.open();
+        d.write("<!DOCTYPE html><html><head><meta charset=UTF-8><style>");
+        d.write("*{margin:0;padding:0;box-sizing:border-box}");
+        d.write("body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:40px 32px;max-width:680px;margin:0 auto}");
+        d.write(".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}");
+        d.write(".hdr{text-align:center;margin-bottom:22px}");
+        d.write(".brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:#E30613;margin-bottom:7px}");
+        d.write("h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}");
+        d.write(".sub{font-size:12px;color:#888}");
+        d.write("hr{border:none;border-top:1px solid #ddd;margin:18px 0}");
+        d.write("p{font-size:14px;line-height:1.8;margin-bottom:8px}");
+        d.write(".mention{font-style:italic;color:#555;font-size:13px;margin:16px 0}");
+        d.write(".bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}");
+        d.write(".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}");
+        d.write(".sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}");
+        d.write("</style></head><body>");
+        d.write("<div class=bar></div>");
+        d.write("<div class=hdr><div class=brand>K O M P A N</div>");
+        d.write("<h1>Attestation sur l&#x2019;Honneur</h1>");
+        d.write("<div class=sub>Note de frais</div></div><hr>");
+        d.write("<p>Je soussign&#xE9;(e) : <strong><u>" + n + "</u></strong></p>");
+        d.write("<p>Atteste sur l&#x2019;honneur, avoir effectu&#xE9; une d&#xE9;pense pour le compte de l&#x2019;entreprise <strong>KOMPAN</strong>.</p>");
+        d.write("<p><strong>Date du paiement :</strong> " + datePay + "</p>");
+        d.write("<p><strong>Nature de la d&#xE9;pense :</strong> " + nature + "</p>");
+        d.write("<p><strong>Montant TTC :</strong> " + montant + " €</p>");
+        d.write("<p class=mention>Fait pour servir et valoir ce que de droit.</p>");
+        d.write("<hr>");
+        d.write("<div class=bottom>");
+        d.write("<div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>");
+        d.write("<div><div class=sig-lbl>Signature :</div>");
+        d.write("<img src='" + signatureData + "' class=sig-img alt=Signature></div>");
+        d.write("</div></body></html>");
+        d.close();
+      }, 80);
+
       document.getElementById("pdfOverlay").classList.add("visible");
       document.getElementById("successBox").classList.remove("hidden");
       window.scrollTo(0,0);
