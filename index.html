@@ -4,842 +4,595 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>KOMPANAttestation</title>
-
-  <!-- PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="KOMPANAttestation"/>
   <meta name="theme-color" content="#111111"/>
-
-  <!-- Icône iOS (K blanc fond vert) inline SVG → PNG base64 -->
   <link rel="apple-touch-icon" id="appIcon" href=""/>
   <script>
     (function(){
-      var c = document.createElement("canvas");
-      c.width = 180; c.height = 180;
-      var ctx = c.getContext("2d");
-      // Green rounded rect
-      var r = 38;
-      ctx.beginPath();
-      ctx.moveTo(r, 0); ctx.lineTo(180-r, 0);
-      ctx.quadraticCurveTo(180, 0, 180, r);
-      ctx.lineTo(180, 180-r);
-      ctx.quadraticCurveTo(180, 180, 180-r, 180);
-      ctx.lineTo(r, 180);
-      ctx.quadraticCurveTo(0, 180, 0, 180-r);
-      ctx.lineTo(0, r);
-      ctx.quadraticCurveTo(0, 0, r, 0);
-      ctx.closePath();
-      ctx.fillStyle = "#2E7D32";
-      ctx.fill();
-      // White K
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "900 108px Arial Black, Arial, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("K", 90, 95);
-      var dataUrl = c.toDataURL("image/png");
-      document.getElementById("appIcon").href = dataUrl;
+      var c=document.createElement("canvas"); c.width=180; c.height=180;
+      var ctx=c.getContext("2d");
+      ctx.beginPath(); ctx.moveTo(38,0); ctx.lineTo(142,0); ctx.quadraticCurveTo(180,0,180,38);
+      ctx.lineTo(180,142); ctx.quadraticCurveTo(180,180,142,180); ctx.lineTo(38,180);
+      ctx.quadraticCurveTo(0,180,0,142); ctx.lineTo(0,38); ctx.quadraticCurveTo(0,0,38,0);
+      ctx.closePath(); ctx.fillStyle="#2E7D32"; ctx.fill();
+      ctx.fillStyle="#fff"; ctx.font="900 108px Arial Black,Arial,sans-serif";
+      ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("K",90,95);
+      document.getElementById("appIcon").href=c.toDataURL("image/png");
     })();
   </script>
-
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--red:#E30613;--bg:#111;--card:#1e1e1e;--card2:#252525;--border:#333;--text:#fff;--muted:#888}
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent}
+    .header{background:var(--bg);border-bottom:2px solid var(--red);position:sticky;top:0;z-index:10}
+    .header-inner{max-width:640px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
+    .logo{font-family:Arial Black,sans-serif;font-weight:900;font-size:22px;color:var(--red)}
+    .hdiv{width:1px;height:34px;background:var(--border);flex-shrink:0}
+    .htitle{font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+    .hsub{font-size:11px;color:var(--muted);margin-top:2px}
+    .hsub span{color:var(--red);font-weight:800}
+    .content{max-width:640px;margin:0 auto;padding:0 20px}
+    .steps{display:flex;margin:22px 0 26px}
+    .step{flex:1;text-align:center;position:relative}
+    .step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;margin:0 auto 7px;border:2px solid var(--border);background:#1a1a1a;color:#444;transition:all .3s}
+    .step-circle.active{background:var(--red);color:#fff;border-color:var(--red)}
+    .step-circle.done{background:#2a2a2a;color:var(--red)}
+    .step-label{font-size:10px;font-weight:500;color:#444;text-transform:uppercase;letter-spacing:.06em}
+    .step-label.active{color:var(--text);font-weight:700}
+    .step-line{position:absolute;top:15px;left:calc(50% + 18px);right:calc(-50% + 18px);height:1px;background:var(--border);transition:background .3s}
+    .step-line.done{background:var(--red)}
+    .card{background:var(--card);border-radius:14px;padding:26px 22px 22px;border:1px solid var(--border)}
+    .field{margin-bottom:20px}
+    .field label{display:block;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+    .field label .req{color:var(--red);margin-left:3px}
+    .field input,.field select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;color:var(--text);background:var(--card2);outline:none;transition:border .2s;-webkit-appearance:none;appearance:none}
+    .field input:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(227,6,19,.15)}
+    .field .hint{color:#444;font-size:11px;margin-top:5px}
+    .field .err{color:var(--red);font-size:12px;margin-top:4px}
+    .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;cursor:pointer}
+    option{background:#252525;color:#fff}
+    .btn-primary{width:100%;padding:13px 0;background:var(--red);border:none;border-radius:9px;font-weight:800;font-size:15px;font-family:inherit;color:#fff;cursor:pointer;letter-spacing:.04em;margin-top:4px;transition:opacity .2s}
+    .btn-primary:active{opacity:.85}
+    .btn-primary:disabled{background:#2a2a2a;color:#444;cursor:not-allowed}
+    .btn-back{flex:1;padding:12px 0;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px}
+    .btn-row{display:flex;gap:10px;margin-top:14px}
+    .sig-canvas{border:1.5px dashed var(--border);border-radius:10px;background:#fff;cursor:crosshair;width:100%;touch-action:none;display:block;max-height:160px}
+    .sig-hint{font-size:11px;color:var(--muted);text-align:center;margin:6px 0}
+    .sig-btns{display:flex;gap:8px}
+    .sig-clear{flex:1;padding:9px 0;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:inherit;cursor:pointer;font-size:13px}
+    .sig-done{border:1.5px solid var(--red);border-radius:10px;padding:12px;text-align:center;background:var(--card2);margin-bottom:12px}
+    .sig-redo{width:100%;padding:8px 0;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:inherit;cursor:pointer;font-size:13px;margin-bottom:14px}
+    .doc-preview{background:#fff;border:2px solid var(--red);border-radius:12px;padding:28px 24px;font-family:Georgia,serif;color:#1a1a1a;position:relative;overflow:hidden}
+    .doc-topbar{position:absolute;top:0;left:0;right:0;height:5px;background:var(--red)}
+    .doc-brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.25em;color:var(--red);text-align:center;margin-bottom:6px;margin-top:8px}
+    .doc-title{font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;text-align:center}
+    .doc-sub{font-size:12px;color:#888;text-align:center;margin-top:2px;margin-bottom:18px}
+    .doc-body{font-size:13px;line-height:1.9}
+    .doc-body p{margin-bottom:6px}
+    .doc-mention{font-style:italic;color:#555;font-size:12px;margin-top:12px}
+    .doc-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px}
+    .doc-sig-label{font-size:11px;color:#888;margin-bottom:4px;text-align:right}
+    .doc-sig-img{height:65px;border:1px solid #eee;border-radius:4px;background:#fff;display:block;margin-left:auto}
+    .success-box{text-align:center;background:var(--card);border:1.5px solid var(--red);border-radius:12px;padding:18px 20px;margin-top:16px}
+    .success-box h3{font-weight:700;margin-bottom:8px}
+    .success-box p{color:var(--muted);font-size:13px;margin-bottom:14px}
+    .footer{text-align:center;padding:28px 0 44px;margin-top:8px}
+    .footer-inner{display:inline-block;border-top:1px solid #2a2a2a;padding-top:14px}
+    .footer-made{font-size:10px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:#3a3a3a}
+    .footer-copy{font-size:10px;color:#2a2a2a;margin-top:3px;letter-spacing:.05em}
+    .hidden{display:none!important}
+    input[type="date"]{color-scheme:dark}
 
-    :root {
-      --red: #E30613;
-      --bg: #111111;
-      --card: #1E1E1E;
-      --card2: #252525;
-      --border: #333333;
-      --text: #FFFFFF;
-      --muted: #888888;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* HEADER */
-    .header {
-      background: var(--bg);
-      border-bottom: 2px solid var(--red);
-      position: sticky; top: 0; z-index: 10;
-    }
-    .header-inner {
-      max-width: 640px; margin: 0 auto;
-      padding: 14px 20px;
-      display: flex; align-items: center; gap: 14px;
-    }
-    .logo {
-      font-family: Arial Black, sans-serif;
-      font-weight: 900; font-size: 22px;
-      color: var(--red); letter-spacing: 0.02em;
-    }
-    .divider { width: 1px; height: 34px; background: var(--border); flex-shrink: 0; }
-    .header-title { font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
-    .header-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .header-sub span { color: var(--red); font-weight: 800; }
-
-    /* CONTENT */
-    .content { max-width: 640px; margin: 0 auto; padding: 0 20px; }
-
-    /* STEPS */
-    .steps { display: flex; margin: 22px 0 26px; }
-    .step { flex: 1; text-align: center; position: relative; }
-    .step-circle {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 13px;
-      margin: 0 auto 7px;
-      border: 2px solid var(--border);
-      background: #1a1a1a; color: #444;
-      transition: all 0.3s;
-    }
-    .step-circle.active { background: var(--red); color: #fff; border-color: var(--red); }
-    .step-circle.done { background: #2a2a2a; color: var(--red); }
-    .step-label { font-size: 10px; font-weight: 500; color: #444; text-transform: uppercase; letter-spacing: 0.06em; }
-    .step-label.active { color: var(--text); font-weight: 700; }
-    .step-line {
-      position: absolute; top: 15px;
-      left: calc(50% + 18px); right: calc(-50% + 18px);
-      height: 1px; background: var(--border); transition: background 0.3s;
-    }
-    .step-line.done { background: var(--red); }
-
-    /* CARD */
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 26px 22px 22px;
-      border: 1px solid var(--border);
-    }
-
-    /* FIELDS */
-    .field { margin-bottom: 20px; }
-    .field label {
-      display: block; font-weight: 700; font-size: 11px;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 7px;
-    }
-    .field label .req { color: var(--red); margin-left: 3px; }
-    .field input, .field select {
-      width: 100%; padding: 11px 14px;
-      border: 1.5px solid var(--border); border-radius: 8px;
-      font-size: 15px; font-family: inherit;
-      color: var(--text); background: var(--card2);
-      outline: none; transition: border 0.2s;
-      -webkit-appearance: none; appearance: none;
-    }
-    .field input:focus, .field select:focus {
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px rgba(227,6,19,0.15);
-    }
-    .field .hint { color: #444; font-size: 11px; margin-top: 5px; }
-    .field .error { color: var(--red); font-size: 12px; margin-top: 4px; }
-    .field select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 38px;
-      cursor: pointer;
-    }
-    option { background: #252525; color: #fff; }
-
-    /* BUTTONS */
-    .btn-primary {
-      width: 100%; padding: 13px 0;
-      background: var(--red); border: none; border-radius: 9px;
-      font-weight: 800; font-size: 15px; font-family: inherit;
-      color: #fff; cursor: pointer; letter-spacing: 0.04em;
-      margin-top: 4px; transition: opacity 0.2s;
-    }
-    .btn-primary:active { opacity: 0.85; }
-    .btn-primary:disabled { background: #2a2a2a; color: #444; cursor: not-allowed; }
-    .btn-back {
-      flex: 1; padding: 12px 0;
-      background: transparent; border: 1.5px solid var(--border);
-      border-radius: 8px; font-family: inherit;
-      cursor: pointer; color: var(--muted); font-weight: 600; font-size: 14px;
-    }
-    .btn-row { display: flex; gap: 10px; margin-top: 14px; }
-
-    /* SIGNATURE PAD */
-    .sig-canvas {
-      border: 1.5px dashed var(--border); border-radius: 10px;
-      background: #fff; cursor: crosshair;
-      width: 100%; touch-action: none; display: block;
-      max-height: 160px;
-    }
-    .sig-hint { font-size: 11px; color: var(--muted); text-align: center; margin: 6px 0; }
-    .sig-btns { display: flex; gap: 8px; }
-    .sig-clear {
-      flex: 1; padding: 9px 0; background: transparent;
-      border: 1.5px solid var(--border); border-radius: 8px;
-      color: var(--muted); font-family: inherit; cursor: pointer; font-size: 13px;
-    }
-    .sig-validate {
-      flex: 2; padding: 9px 0; background: #2a2a2a;
-      border: none; border-radius: 8px;
-      color: #555; font-family: inherit; font-weight: 700;
-      cursor: not-allowed; font-size: 13px; transition: all 0.2s;
-    }
-    .sig-validate.active { background: var(--red); color: #fff; cursor: pointer; }
-    .sig-preview {
-      border: 1.5px solid var(--red); border-radius: 10px; padding: 12px;
-      text-align: center; background: var(--card2); margin-bottom: 12px;
-    }
-    .sig-preview img { max-height: 100px; }
-    .sig-redo {
-      width: 100%; padding: 8px 0; background: transparent;
-      border: 1.5px solid var(--border); border-radius: 8px;
-      color: var(--muted); font-family: inherit; cursor: pointer;
-      font-size: 13px; margin-bottom: 14px;
-    }
-
-    /* PREVIEW DOCUMENT */
-    .doc-preview {
-      background: #fff; border: 2px solid var(--red);
-      border-radius: 12px; padding: 28px 24px;
-      font-family: Georgia, serif; color: #1a1a1a;
-      position: relative; overflow: hidden;
-    }
-    .doc-topbar {
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 5px; background: var(--red);
-    }
-    .doc-header { text-align: center; margin-bottom: 20px; margin-top: 8px; }
-    .doc-brand {
-      font-family: Arial Black, sans-serif; font-weight: 900;
-      font-size: 11px; letter-spacing: 0.25em;
-      color: var(--red); margin-bottom: 6px;
-    }
-    .doc-title { font-weight: 700; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; }
-    .doc-sub { font-size: 12px; color: #888; margin-top: 2px; }
-    .doc-body { font-size: 13px; line-height: 1.9; }
-    .doc-body p { margin-bottom: 4px; }
-    .doc-mention { font-style: italic; color: #555; font-size: 12px; margin-top: 12px; }
-    .doc-bottom {
-      display: flex; justify-content: space-between;
-      align-items: flex-end; margin-top: 20px;
-    }
-    .doc-date { font-size: 13px; }
-    .doc-sig-label { font-size: 11px; color: #888; margin-bottom: 4px; text-align: right; }
-    .doc-sig-img { height: 65px; border: 1px solid #eee; border-radius: 4px; background: #fff; display: block; margin-left: auto; }
-    .doc-sig-empty {
-      width: 130px; height: 55px; border: 1px dashed #ccc;
-      border-radius: 4px; display: flex; align-items: center;
-      justify-content: center; color: #bbb; font-size: 11px;
-    }
-
-    /* SUCCESS BOX */
-    .success-box {
-      text-align: center; background: var(--card);
-      border: 1.5px solid var(--red); border-radius: 12px;
-      padding: 18px 20px; margin-top: 16px;
-    }
-    .success-box h3 { font-weight: 700; margin-bottom: 8px; }
-    .success-box p { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
-
-    /* FOOTER */
-    .footer {
-      text-align: center; padding: 28px 0 44px; margin-top: 8px;
-    }
-    .footer-inner { display: inline-block; border-top: 1px solid #2a2a2a; padding-top: 14px; }
-    .footer-made { font-size: 10px; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: #3a3a3a; }
-    .footer-copy { font-size: 10px; color: #2a2a2a; margin-top: 3px; letter-spacing: 0.05em; }
-
-    /* HIDDEN */
-    .hidden { display: none !important; }
-
-
-    /* PDF OVERLAY */
-    #pdfOverlay {
-      display: none;
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 10000;
-      background: #111;
-      flex-direction: column;
-    }
-    #pdfOverlay.visible { display: flex; }
-    .pdf-toolbar {
-      background: #1a1a1a;
-      border-bottom: 2px solid #E30613;
-      padding: 12px 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .pdf-toolbar-title { font-weight: 700; font-size: 14px; color: #fff; }
-    .pdf-toolbar-sub { font-size: 11px; color: #888; margin-top: 2px; }
-    .pdf-close {
-      background: #333; border: none; border-radius: 8px;
-      color: #fff; font-size: 13px; padding: 8px 14px;
-      cursor: pointer; font-family: inherit; font-weight: 600;
-    }
-    .pdf-frame-wrap { flex: 1; overflow: auto; padding: 16px; }
-    .pdf-embed {
-      width: 100%; min-height: 80vh;
-      border: none; border-radius: 8px;
-      display: block;
-    }
-    .pdf-hint {
-      text-align: center; padding: 12px 16px;
-      background: #1a1a1a; border-top: 1px solid #333;
-      flex-shrink: 0;
-    }
-    .pdf-hint p { color: #888; font-size: 13px; margin-bottom: 10px; }
-    .pdf-share-btn {
-      display: block; width: 100%;
-      background: #fff; border: 2px solid #E30613;
-      border-radius: 8px; color: #E30613;
-      font-weight: 800; font-size: 16px;
-      padding: 13px 24px; cursor: pointer;
-      font-family: inherit; margin-bottom: 10px;
-      letter-spacing: 0.03em;
-    }
-    .pdf-new-btn {
-      background: #E30613; border: none; border-radius: 8px;
-      color: #fff; font-weight: 700; font-size: 14px;
-      padding: 11px 24px; cursor: pointer; font-family: inherit;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      input[type="date"] { color-scheme: dark; }
-    }
+    /* IMAGE OVERLAY */
+    #imgOverlay{display:none;position:fixed;inset:0;z-index:10000;background:#000;flex-direction:column}
+    #imgOverlay.visible{display:flex}
+    .img-toolbar{background:#1a1a1a;border-bottom:2px solid var(--red);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .img-toolbar-title{font-weight:700;font-size:14px;color:#fff}
+    .img-toolbar-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .img-close{background:#333;border:none;border-radius:8px;color:#fff;font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;font-weight:600}
+    .img-scroll{flex:1;overflow:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center}
+    #previewImg{max-width:100%;border-radius:8px;display:block}
+    .img-hint{text-align:center;padding:12px 16px;background:#1a1a1a;border-top:1px solid #333;flex-shrink:0}
+    .img-share-btn{display:block;width:100%;background:#fff;border:2px solid var(--red);border-radius:8px;color:var(--red);font-weight:800;font-size:16px;padding:13px 24px;cursor:pointer;font-family:inherit;margin-bottom:10px;letter-spacing:.03em}
+    .img-new-btn{background:var(--red);border:none;border-radius:8px;color:#fff;font-weight:800;font-size:14px;padding:11px 24px;cursor:pointer;font-family:inherit}
+    #genCanvas{display:none}
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-inner">
-      <div class="logo">KOMPAN</div>
-      <div class="divider"></div>
-      <div>
-        <div class="header-title">Attestation sur l'Honneur</div>
-        <div class="header-sub">Note de frais · <span>by ROMGER</span></div>
-      </div>
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">KOMPAN</div>
+    <div class="hdiv"></div>
+    <div>
+      <div class="htitle">Attestation sur l'Honneur</div>
+      <div class="hsub">Note de frais &middot; <span>by ROMGER</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="steps">
+    <div class="step">
+      <div class="step-circle active" id="c1">1</div>
+      <div class="step-label active" id="l1">Infos</div>
+      <div class="step-line" id="ln1"></div>
+    </div>
+    <div class="step">
+      <div class="step-circle" id="c2">2</div>
+      <div class="step-label" id="l2">Signature</div>
+      <div class="step-line" id="ln2"></div>
+    </div>
+    <div class="step">
+      <div class="step-circle" id="c3">3</div>
+      <div class="step-label" id="l3">Aper&ccedil;u</div>
     </div>
   </div>
 
-  <!-- CONTENT -->
-  <div class="content">
+  <!-- STEP 1 -->
+  <div class="card" id="step1">
+    <div class="field">
+      <label>Nom et pr&eacute;nom <span class="req">*</span></label>
+      <input type="text" id="nom" placeholder="Votre nom complet"/>
+      <div class="err hidden" id="err-nom">Champ requis</div>
+    </div>
+    <div class="field">
+      <label>Date du paiement <span class="req">*</span></label>
+      <input type="date" id="datePaiement"/>
+      <div class="err hidden" id="err-date">Champ requis</div>
+    </div>
+    <div class="field">
+      <label>Nature de la d&eacute;pense <span class="req">*</span></label>
+      <select id="nature">
+        <option value="">-- S&eacute;lectionner --</option>
+        <option>Achat petit mat&eacute;riel pour projets d'installation</option>
+        <option>Autres frais de personnel</option>
+        <option>Autres frais de v&eacute;hicule</option>
+        <option>D&eacute;placement, h&ocirc;tel</option>
+        <option>D&eacute;placement, repas individuel (midi ou soir)</option>
+        <option>D&eacute;placements - Autres</option>
+        <option>Frais bancaires</option>
+        <option>Parking</option>
+        <option>Repas - Reunion, Formation, Autres (sans TVA)</option>
+        <option>V&eacute;hicule, Entretien camion ISA</option>
+        <option>V&eacute;hicule, carburant camion ISA</option>
+      </select>
+      <div class="err hidden" id="err-nature">Champ requis</div>
+    </div>
+    <div class="field">
+      <label>Montant TTC (&euro;) <span class="req">*</span></label>
+      <input type="number" id="montant" placeholder="0.00" step="0.01" min="0"/>
+      <div class="err hidden" id="err-montant">Montant invalide</div>
+    </div>
+    <div class="field">
+      <label>Lieu de r&eacute;daction de l'attestation</label>
+      <input type="text" id="lieu" placeholder="Ex : Paris, Lyon..."/>
+      <div class="hint">&#128205; Ville depuis laquelle vous &eacute;tablissez cette attestation</div>
+    </div>
+    <button class="btn-primary" onclick="goStep2()">Suivant &rarr; Signature</button>
+  </div>
 
-    <!-- STEPS -->
-    <div class="steps">
-      <div class="step">
-        <div class="step-circle active" id="circle-1">1</div>
-        <div class="step-label active" id="label-1">Infos</div>
-        <div class="step-line" id="line-1"></div>
-      </div>
-      <div class="step">
-        <div class="step-circle" id="circle-2">2</div>
-        <div class="step-label" id="label-2">Signature</div>
-        <div class="step-line" id="line-2"></div>
-      </div>
-      <div class="step">
-        <div class="step-circle" id="circle-3">3</div>
-        <div class="step-label" id="label-3">Aperçu</div>
+  <!-- STEP 2 -->
+  <div class="card hidden" id="step2">
+    <div style="margin-bottom:20px">
+      <div style="font-weight:700;font-size:16px;margin-bottom:5px">Votre signature</div>
+      <div style="color:var(--muted);font-size:13px">Signez dans le cadre ci-dessous.</div>
+    </div>
+    <div id="sigPadArea">
+      <canvas id="sigCanvas" class="sig-canvas" width="500" height="160"></canvas>
+      <div class="sig-hint">Signez avec votre doigt ou votre souris</div>
+      <div class="sig-btns">
+        <button class="sig-clear" onclick="clearSig()">&#10005; Effacer</button>
+        <button class="btn-primary" onclick="validateSig()" style="flex:2;margin-top:0;padding:9px 0;font-size:13px">&#10003; Valider &amp; continuer</button>
       </div>
     </div>
-
-    <!-- STEP 1: FORM -->
-    <div class="card" id="step1">
-      <div class="field">
-        <label>Nom et prénom <span class="req">*</span></label>
-        <input type="text" id="nom" placeholder="Votre nom complet"/>
-        <div class="error hidden" id="err-nom">Champ requis</div>
-      </div>
-      <div class="field">
-        <label>Date du paiement <span class="req">*</span></label>
-        <input type="date" id="datePaiement" style="color-scheme:dark"/>
-        <div class="error hidden" id="err-date">Champ requis</div>
-      </div>
-      <div class="field">
-        <label>Nature de la dépense <span class="req">*</span></label>
-        <select id="nature">
-          <option value="">-- Sélectionner --</option>
-          <option>Achat petit matériel pour projets d'installation</option>
-          <option>Autres frais de personnel</option>
-          <option>Autres frais de véhicule</option>
-          <option>Déplacement, hôtel</option>
-          <option>Déplacement, repas individuel (midi ou soir)</option>
-          <option>Déplacements - Autres</option>
-          <option>Frais bancaires</option>
-          <option>Parking</option>
-          <option>Repas - Reunion, Formation, Autres (sans TVA)</option>
-          <option>Véhicule, Entretien camion ISA</option>
-          <option>Véhicule, carburant camion ISA</option>
-        </select>
-        <div class="error hidden" id="err-nature">Champ requis</div>
-      </div>
-      <div class="field">
-        <label>Montant TTC (€) <span class="req">*</span></label>
-        <input type="number" id="montant" placeholder="0.00" step="0.01" min="0"/>
-        <div class="error hidden" id="err-montant">Montant invalide</div>
-      </div>
-      <div class="field">
-        <label>Lieu de rédaction de l'attestation</label>
-        <input type="text" id="lieu" placeholder="Ex : Paris, Lyon..."/>
-        <div class="hint">📍 Ville depuis laquelle vous établissez cette attestation</div>
-      </div>
-      <button class="btn-primary" onclick="goStep2()">Suivant → Signature</button>
+    <div id="sigDoneArea" class="hidden">
+      <div class="sig-done"><img id="sigPreview" src="" style="max-height:100px" alt="sig"/></div>
+      <button class="sig-redo" onclick="redoSig()">&#8635; Recommencer</button>
     </div>
-
-    <!-- STEP 2: SIGNATURE -->
-    <div class="card hidden" id="step2">
-      <div style="margin-bottom:20px">
-        <div style="font-weight:700;font-size:16px;margin-bottom:5px">Votre signature</div>
-        <div style="color:var(--muted);font-size:13px">Signez dans le cadre ci-dessous.</div>
-      </div>
-
-      <div id="sig-pad-area">
-        <canvas id="sigCanvas" class="sig-canvas" width="500" height="160"></canvas>
-        <div class="sig-hint">Signez avec votre doigt ou votre souris</div>
-        <div class="sig-btns">
-          <button class="sig-clear" onclick="clearSig()">✕ Effacer</button>
-          <button class="sig-validate active" id="sigValidateBtn" onclick="validateSig()" style="flex:2;padding:9px 0;background:var(--red);border:none;border-radius:8px;color:#fff;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer">✓ Valider &amp; continuer</button>
-        </div>
-      </div>
-
-      <div class="btn-row" style="margin-top:14px">
-        <button class="btn-back" onclick="goStep1()">← Retour</button>
-      </div>
-    </div>
-
-    <!-- STEP 3: PREVIEW -->
-    <div class="hidden" id="step3">
-      <!-- Document preview -->
-      <div class="doc-preview">
-        <div class="doc-topbar"></div>
-        <div class="doc-header">
-          <div class="doc-brand">KOMPAN</div>
-          <div class="doc-title">Attestation sur l'Honneur</div>
-          <div class="doc-sub">Note de frais</div>
-        </div>
-        <div class="doc-body">
-          <p>Je soussigné(e) : <strong><span id="pv-nom" style="border-bottom:1px solid #333;padding-bottom:1px"></span></strong></p>
-          <p>Atteste sur l'honneur, avoir effectué une dépense pour le compte de l'entreprise <strong>KOMPAN</strong>.</p>
-          <p><strong>Date du paiement :</strong> <span id="pv-date"></span></p>
-          <p><strong>Nature de la dépense :</strong> <span id="pv-nature"></span></p>
-          <p><strong>Montant TTC :</strong> <span id="pv-montant"></span></p>
-        </div>
-        <p class="doc-mention">Fait pour servir et valoir ce que de droit.</p>
-        <div class="doc-bottom">
-          <div class="doc-date">
-            <strong>Date et lieu :</strong><br/>
-            <span id="pv-lieu"></span>
-          </div>
-          <div>
-            <div class="doc-sig-label">Signature</div>
-            <img id="pv-sig" class="doc-sig-img hidden" src="" alt="Signature"/>
-            <div class="doc-sig-empty" id="pv-sig-empty">à signer</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action buttons -->
-      <div class="btn-row" style="margin:18px 0">
-        <button class="btn-back" onclick="goStep2()">← Modifier</button>
-        <button class="btn-primary" onclick="telecharger()" style="flex:2;margin-top:0">📄 Générer le PDF</button>
-      </div>
-
-      <!-- Success box -->
-      <div class="success-box hidden" id="successBox">
-        <h3>✅ PDF généré !</h3>
-        <p>Le PDF s'affiche. Utilisez <strong>Partager ↗</strong> pour l'enregistrer.</p>
-        <button class="btn-primary" onclick="reset()" style="width:auto;padding:9px 24px;margin-top:10px">+ Nouvelle attestation</button>
-      </div>
-    </div>
-
-    <!-- FOOTER -->
-    <div class="footer">
-      <div class="footer-inner">
-        <div class="footer-made">MADE BY ROMGER</div>
-        <div class="footer-copy">KOMPAN © <span id="yr"></span> — Usage interne</div>
-      </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep1()">&#8592; Retour</button>
+      <button class="btn-primary" id="btnStep3" onclick="goStep3()" disabled style="flex:2;margin-top:0">Voir l'aper&ccedil;u &rarr;</button>
     </div>
   </div>
 
-  <script>
-    document.getElementById("yr").textContent = new Date().getFullYear();
-
-    // ── STATE ──
-    let signatureData = null;
-    let hasDrawn = false;
-    let drawing = false;
-    let lastX = 0, lastY = 0;
-    let currentStep = 1;
-
-    // ── CANVAS SETUP ──
-    const canvas = document.getElementById("sigCanvas");
-    const ctx = canvas.getContext("2d");
-
-    function initCanvas() {
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "#111111";
-      ctx.lineWidth = 2.5;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      hasDrawn = false;
-      document.getElementById("sigValidateBtn").classList.remove("active");
-    }
-
-    function getPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      if (e.touches) return {
-        x: (e.touches[0].clientX - rect.left) * scaleX,
-        y: (e.touches[0].clientY - rect.top) * scaleY
-      };
-      return {
-        x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
-      };
-    }
-
-    canvas.addEventListener("mousedown", e => { drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
-    canvas.addEventListener("mousemove", e => {
-      if (!drawing) return;
-      const p = getPos(e);
-      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
-      lastX = p.x; lastY = p.y;
-      hasDrawn = true;
-      document.getElementById("sigValidateBtn").classList.add("active");
-    });
-    canvas.addEventListener("mouseup", () => drawing = false);
-    canvas.addEventListener("mouseleave", () => drawing = false);
-
-    canvas.addEventListener("touchstart", e => { e.preventDefault(); drawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; }, { passive: false });
-    canvas.addEventListener("touchmove", e => {
-      e.preventDefault();
-      if (!drawing) return;
-      const p = getPos(e);
-      ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
-      lastX = p.x; lastY = p.y;
-      hasDrawn = true;
-      document.getElementById("sigValidateBtn").classList.add("active");
-    }, { passive: false });
-    canvas.addEventListener("touchend", e => { e.preventDefault(); drawing = false; }, { passive: false });
-
-    function clearSig() {
-      initCanvas();
-    }
-
-    function validateSig() {
-      if (!hasDrawn) {
-        document.getElementById("sigCanvas").style.border = "2px dashed #E30613";
-        setTimeout(() => document.getElementById("sigCanvas").style.border = "1.5px dashed var(--border)", 1000);
-        return;
-      }
-      signatureData = canvas.toDataURL("image/png");
-      goStep3();
-    }
-
-    // ── STEPS ──
-    function updateSteps(step) {
-      currentStep = step;
-      for (let i = 1; i <= 3; i++) {
-        const circle = document.getElementById("circle-" + i);
-        const label = document.getElementById("label-" + i);
-        circle.className = "step-circle" + (i === step ? " active" : i < step ? " done" : "");
-        circle.textContent = i < step ? "✓" : i;
-        if (label) label.className = "step-label" + (i === step ? " active" : "");
-        if (i < 3) {
-          const line = document.getElementById("line-" + i);
-          if (line) line.className = "step-line" + (i < step ? " done" : "");
-        }
-      }
-    }
-
-    function validate() {
-      let ok = true;
-      const nom = document.getElementById("nom").value.trim();
-      const date = document.getElementById("datePaiement").value;
-      const nature = document.getElementById("nature").value;
-      const montant = document.getElementById("montant").value;
-
-      document.getElementById("err-nom").classList.toggle("hidden", !!nom);
-      document.getElementById("err-date").classList.toggle("hidden", !!date);
-      document.getElementById("err-nature").classList.toggle("hidden", !!nature);
-      document.getElementById("err-montant").classList.toggle("hidden", !!(montant && !isNaN(montant)));
-
-      if (!nom || !date || !nature || !montant || isNaN(montant)) ok = false;
-      return ok;
-    }
-
-    function goStep1() {
-      document.getElementById("step1").classList.remove("hidden");
-      document.getElementById("step2").classList.add("hidden");
-      document.getElementById("step3").classList.add("hidden");
-      updateSteps(1);
-      window.scrollTo(0, 0);
-    }
-
-    function goStep2() {
-      if (currentStep === 1 && !validate()) return;
-      document.getElementById("step1").classList.add("hidden");
-      document.getElementById("step2").classList.remove("hidden");
-      document.getElementById("step3").classList.add("hidden");
-      updateSteps(2);
-      if (!signatureData) initCanvas();
-      window.scrollTo(0, 0);
-    }
-
-    function goStep3() {
-      if (!signatureData) {
-        document.getElementById("sig-warning").classList.remove("hidden");
-        return;
-      }
-      // Fill preview
-      const nom = document.getElementById("nom").value.trim();
-      const dateVal = document.getElementById("datePaiement").value;
-      const nature = document.getElementById("nature").value;
-      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
-      const lieu = document.getElementById("lieu").value.trim();
-      const today = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
-      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "";
-
-      document.getElementById("pv-nom").textContent = nom;
-      document.getElementById("pv-date").textContent = datePay;
-      document.getElementById("pv-nature").textContent = nature;
-      document.getElementById("pv-montant").textContent = montant + " €";
-      document.getElementById("pv-lieu").textContent = lieu ? today + ", " + lieu : today;
-
-      const sigImg = document.getElementById("pv-sig");
-      const sigEmpty = document.getElementById("pv-sig-empty");
-      sigImg.src = signatureData;
-      sigImg.classList.remove("hidden");
-      sigEmpty.classList.add("hidden");
-
-      document.getElementById("step1").classList.add("hidden");
-      document.getElementById("step2").classList.add("hidden");
-      document.getElementById("step3").classList.remove("hidden");
-      document.getElementById("successBox").classList.add("hidden");
-      updateSteps(3);
-      window.scrollTo(0, 0);
-    }
-
-    // ── DOWNLOAD PDF ──
-    function telecharger() {
-      const n = document.getElementById("nom").value.trim();
-      const dateVal = document.getElementById("datePaiement").value;
-      const nature = document.getElementById("nature").value;
-      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
-      const lieu = document.getElementById("lieu").value.trim();
-      const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
-      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
-      const lieuDate = lieu ? today+", "+lieu : today;
-
-      // Build the document using same reliable d.write approach
-      const iframe = document.getElementById("pdfIframe");
-      iframe.src = "about:blank";
-
-      setTimeout(function() {
-        const d = iframe.contentDocument;
-        d.open();
-        d.write("<!DOCTYPE html><html><head><meta charset=UTF-8>");
-        d.write("<style>");
-        d.write("*{margin:0;padding:0;box-sizing:border-box}");
-        d.write("body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:40px 32px;max-width:680px;margin:0 auto}");
-        d.write(".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}");
-        d.write(".hdr{text-align:center;margin-bottom:22px}");
-        d.write(".brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:#E30613;margin-bottom:7px}");
-        d.write("h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}");
-        d.write(".sub{font-size:12px;color:#888}");
-        d.write("hr{border:none;border-top:1px solid #ddd;margin:18px 0}");
-        d.write("p{font-size:14px;line-height:1.8;margin-bottom:8px}");
-        d.write(".mention{font-style:italic;color:#555;font-size:13px;margin:16px 0}");
-        d.write(".bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}");
-        d.write(".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}");
-        d.write(".sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}");
-        d.write("@media print{.no-print{display:none!important}body{padding:20px}@page{margin:1cm}}");
-        d.write("</style></head><body>");
-        d.write("<div class=bar></div>");
-        d.write("<div class=hdr>");
-        d.write("<div class=brand>K O M P A N</div>");
-        d.write("<h1>Attestation sur l’Honneur</h1>");
-        d.write("<div class=sub>Note de frais</div>");
-        d.write("</div><hr>");
-        d.write("<p>Je soussigné(e) : <strong><u>" + n + "</u></strong></p>");
-        d.write("<p>Atteste sur l’honneur, avoir effectué une dépense pour le compte de l’entreprise <strong>KOMPAN</strong>.</p>");
-        d.write("<p><strong>Date du paiement :</strong> " + datePay + "</p>");
-        d.write("<p><strong>Nature de la dépense :</strong> " + nature + "</p>");
-        d.write("<p><strong>Montant TTC :</strong> " + montant + " €</p>");
-        d.write("<p class=mention>Fait pour servir et valoir ce que de droit.</p>");
-        d.write("<hr>");
-        d.write("<div class=bottom>");
-        d.write("<div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>");
-        d.write("<div><div class=sig-lbl>Signature :</div>");
-        d.write("<img src='" + signatureData + "' class=sig-img alt=Signature></div>");
-        d.write("</div>");
-        d.write("</body></html>");
-        d.close();
-      }, 80);
-
-      document.getElementById("pdfOverlay").classList.add("visible");
-      document.getElementById("successBox").classList.remove("hidden");
-      window.scrollTo(0,0);
-    }
-
-
-    function showPdfOverlay(dataUri, nom) {
-      const n = document.getElementById("nom").value.trim();
-      const dateVal = document.getElementById("datePaiement").value;
-      const nature = document.getElementById("nature").value;
-      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
-      const lieu = document.getElementById("lieu").value.trim();
-      const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
-      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
-      const lieuDate = lieu ? today+", "+lieu : today;
-
-      // Build DOM directly in iframe - no template literals, no encoding issues
-      const iframe = document.getElementById("pdfIframe");
-      iframe.src = "about:blank";
-
-      setTimeout(function() {
-        const d = iframe.contentDocument;
-        d.open();
-        d.write("<!DOCTYPE html><html><head><meta charset=UTF-8><style>");
-        d.write("*{margin:0;padding:0;box-sizing:border-box}");
-        d.write("body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:40px 32px;max-width:680px;margin:0 auto}");
-        d.write(".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}");
-        d.write(".hdr{text-align:center;margin-bottom:22px}");
-        d.write(".brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:#E30613;margin-bottom:7px}");
-        d.write("h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}");
-        d.write(".sub{font-size:12px;color:#888}");
-        d.write("hr{border:none;border-top:1px solid #ddd;margin:18px 0}");
-        d.write("p{font-size:14px;line-height:1.8;margin-bottom:8px}");
-        d.write(".mention{font-style:italic;color:#555;font-size:13px;margin:16px 0}");
-        d.write(".bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}");
-        d.write(".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}");
-        d.write(".sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}");
-        d.write("</style></head><body>");
-        d.write("<div class=bar></div>");
-        d.write("<div class=hdr><div class=brand>K O M P A N</div>");
-        d.write("<h1>Attestation sur l&#x2019;Honneur</h1>");
-        d.write("<div class=sub>Note de frais</div></div><hr>");
-        d.write("<p>Je soussign&#xE9;(e) : <strong><u>" + n + "</u></strong></p>");
-        d.write("<p>Atteste sur l&#x2019;honneur, avoir effectu&#xE9; une d&#xE9;pense pour le compte de l&#x2019;entreprise <strong>KOMPAN</strong>.</p>");
-        d.write("<p><strong>Date du paiement :</strong> " + datePay + "</p>");
-        d.write("<p><strong>Nature de la d&#xE9;pense :</strong> " + nature + "</p>");
-        d.write("<p><strong>Montant TTC :</strong> " + montant + " €</p>");
-        d.write("<p class=mention>Fait pour servir et valoir ce que de droit.</p>");
-        d.write("<hr>");
-        d.write("<div class=bottom>");
-        d.write("<div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>");
-        d.write("<div><div class=sig-lbl>Signature :</div>");
-        d.write("<img src='" + signatureData + "' class=sig-img alt=Signature></div>");
-        d.write("</div></body></html>");
-        d.close();
-      }, 80);
-
-      document.getElementById("pdfOverlay").classList.add("visible");
-      document.getElementById("successBox").classList.remove("hidden");
-      window.scrollTo(0,0);
-    }
-
-    let currentDocHtml = "";
-    let currentNom = "";
-
-    function closePdfOverlay() {
-      document.getElementById("pdfOverlay").classList.remove("visible");
-    }
-
-    async function sharePdf() {
-      const n = document.getElementById("nom").value.trim();
-      const dateVal = document.getElementById("datePaiement").value;
-      const nature = document.getElementById("nature").value;
-      const montant = parseFloat(document.getElementById("montant").value).toFixed(2);
-      const lieu = document.getElementById("lieu").value.trim();
-      const today = new Date().toLocaleDateString("fr-FR", {day:"2-digit",month:"long",year:"numeric"});
-      const datePay = dateVal ? new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}) : "";
-      const lieuDate = lieu ? today+", "+lieu : today;
-
-      // Build HTML string
-      var html = "<!DOCTYPE html><html><head><meta charset=UTF-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Attestation KOMPAN</title><style>";
-      html += "*{margin:0;padding:0;box-sizing:border-box}body{font-family:Georgia,serif;color:#1a1a1a;padding:40px 32px;max-width:680px;margin:0 auto}";
-      html += ".bar{background:#E30613;height:6px;margin:-40px -32px 32px -32px}.hdr{text-align:center;margin-bottom:22px}";
-      html += ".brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:#E30613;margin-bottom:7px}";
-      html += "h1{font-size:16px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}.sub{font-size:12px;color:#888}";
-      html += "hr{border:none;border-top:1px solid #ddd;margin:18px 0}p{font-size:14px;line-height:1.8;margin-bottom:8px}";
-      html += ".mention{font-style:italic;color:#555;font-size:13px;margin:16px 0}";
-      html += ".bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px}";
-      html += ".sig-lbl{font-size:11px;color:#888;margin-bottom:4px}.sig-img{height:70px;border:1px solid #eee;border-radius:4px;display:block}";
-      html += "</style></head><body>";
-      html += "<div class=bar></div><div class=hdr><div class=brand>K O M P A N</div>";
-      html += "<h1>Attestation sur l’Honneur</h1><div class=sub>Note de frais</div></div><hr>";
-      html += "<p>Je soussigné(e) : <strong><u>" + n + "</u></strong></p>";
-      html += "<p>Atteste sur l’honneur, avoir effectué une dépense pour le compte de l’entreprise <strong>KOMPAN</strong>.</p>";
-      html += "<p><strong>Date du paiement :</strong> " + datePay + "</p>";
-      html += "<p><strong>Nature de la dépense :</strong> " + nature + "</p>";
-      html += "<p><strong>Montant TTC :</strong> " + montant + " €</p>";
-      html += "<p class=mention>Fait pour servir et valoir ce que de droit.</p><hr>";
-      html += "<div class=bottom><div><strong>Date et lieu :</strong><br>" + lieuDate + "</div>";
-      html += "<div><div class=sig-lbl>Signature :</div><img src='" + signatureData + "' class=sig-img></div></div>";
-      html += "</body></html>";
-
-      // Share as HTML file using Web Share API - works in PWA fullscreen mode
-      try {
-        var blob = new Blob([html], {type: "text/html"});
-        var file = new File([blob], "Attestation_KOMPAN_" + n.replace(/\s+/g,"_") + ".html", {type: "text/html"});
-        if (navigator.canShare && navigator.canShare({files:[file]})) {
-          await navigator.share({files:[file], title:"Attestation KOMPAN - " + n});
-          return;
-        }
-      } catch(e) { console.log(e); }
-
-      // Fallback: download the file
-      try {
-        var blob2 = new Blob([html], {type: "text/html"});
-        var url = URL.createObjectURL(blob2);
-        var a = document.createElement("a");
-        a.href = url; a.download = "Attestation_KOMPAN_" + n.replace(/\s+/g,"_") + ".html";
-        document.body.appendChild(a); a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } catch(e2) { alert("Utilisez Safari (hors mode plein écran) pour enregistrer le document."); }
-    }
-
-    // ── RESET ──
-    function reset() {
-      document.getElementById("nom").value = "";
-      document.getElementById("datePaiement").value = "";
-      document.getElementById("nature").value = "";
-      document.getElementById("montant").value = "";
-      document.getElementById("lieu").value = "";
-      signatureData = null;
-      goStep1();
-    }
-
-    // Init
-    initCanvas();
-  </script>
-
-  <!-- PDF OVERLAY -->
-  <div id="pdfOverlay">
-    <div class="pdf-toolbar">
-      <div>
-        <div class="pdf-toolbar-title">📄 Attestation KOMPAN</div>
-        <div class="pdf-toolbar-sub">Appuyez sur Partager ↗ pour enregistrer</div>
+  <!-- STEP 3 -->
+  <div class="hidden" id="step3">
+    <div class="doc-preview">
+      <div class="doc-topbar"></div>
+      <div class="doc-brand">KOMPAN</div>
+      <div class="doc-title">Attestation sur l'Honneur</div>
+      <div class="doc-sub">Note de frais</div>
+      <hr style="border:none;border-top:1px solid #ddd;margin-bottom:14px"/>
+      <div class="doc-body">
+        <p>Je soussign&eacute;(e) : <strong><span id="pv-nom" style="border-bottom:1px solid #333;padding-bottom:1px"></span></strong></p>
+        <p>Atteste sur l'honneur, avoir effectu&eacute; une d&eacute;pense pour le compte de l'entreprise <strong>KOMPAN</strong>.</p>
+        <p><strong>Date du paiement :</strong> <span id="pv-date"></span></p>
+        <p><strong>Nature de la d&eacute;pense :</strong> <span id="pv-nature"></span></p>
+        <p><strong>Montant TTC :</strong> <span id="pv-montant"></span></p>
       </div>
-      <button class="pdf-close" onclick="closePdfOverlay()">✕ Fermer</button>
+      <p class="doc-mention">Fait pour servir et valoir ce que de droit.</p>
+      <div class="doc-bottom">
+        <div style="font-size:13px"><strong>Date et lieu :</strong><br/><span id="pv-lieu"></span></div>
+        <div>
+          <div class="doc-sig-label">Signature</div>
+          <img id="pv-sig" class="doc-sig-img hidden" src="" alt="sig"/>
+        </div>
+      </div>
     </div>
-    <div class="pdf-frame-wrap" style="padding:0">
-      <iframe id="pdfIframe" srcdoc="" style="width:100%;height:calc(100vh - 130px);border:none;background:#fff;display:block;"></iframe>
+
+    <div class="btn-row" style="margin:18px 0">
+      <button class="btn-back" onclick="goStep2()">&#8592; Modifier</button>
+      <button class="btn-primary" onclick="genImage()" style="flex:2;margin-top:0">&#128248; G&eacute;n&eacute;rer l'image</button>
     </div>
-    <div class="pdf-hint">
-      <button class="pdf-share-btn" onclick="sharePdf()" id="shareBtn">↗ Partager / Enregistrer</button>
-      <button class="pdf-new-btn" onclick="closePdfOverlay(); reset();">+ Nouvelle attestation</button>
+
+    <div class="success-box hidden" id="successBox">
+      <h3>&#10003; Image g&eacute;n&eacute;r&eacute;e !</h3>
+      <p>Appuyez longuement sur l'image pour l'enregistrer dans Photos.</p>
+      <button class="img-new-btn" onclick="reset()">+ Nouvelle attestation</button>
     </div>
   </div>
 
+  <div class="footer">
+    <div class="footer-inner">
+      <div class="footer-made">MADE BY ROMGER</div>
+      <div class="footer-copy">KOMPAN &copy; <span id="yr"></span> &mdash; Usage interne</div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE OVERLAY -->
+<div id="imgOverlay">
+  <div class="img-toolbar">
+    <div>
+      <div class="img-toolbar-title">&#128248; Attestation KOMPAN</div>
+      <div class="img-toolbar-sub">Appuyez longuement sur l'image &rarr; Enregistrer dans Photos</div>
+    </div>
+    <button class="img-close" onclick="closeImg()">&#10005; Fermer</button>
+  </div>
+  <div class="img-scroll">
+    <img id="previewImg" src="" alt="attestation"/>
+  </div>
+  <div class="img-hint">
+    <button class="img-share-btn" onclick="shareImg()">&#8599; Partager / Enregistrer</button>
+    <button class="img-new-btn" onclick="closeImg();reset()">+ Nouvelle attestation</button>
+  </div>
+</div>
+
+<canvas id="genCanvas"></canvas>
+
+<script>
+document.getElementById("yr").textContent = new Date().getFullYear();
+
+var signatureData = null;
+var hasDrawn = false;
+var drawing = false;
+var lastX = 0, lastY = 0;
+var currentStep = 1;
+var generatedBlob = null;
+
+// Canvas signature
+var sigCanvas = document.getElementById("sigCanvas");
+var ctx = sigCanvas.getContext("2d");
+
+function initCanvas() {
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
+  ctx.strokeStyle = "#111";
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  hasDrawn = false;
+}
+
+function getPos(e) {
+  var rect = sigCanvas.getBoundingClientRect();
+  var scaleX = sigCanvas.width / rect.width;
+  var scaleY = sigCanvas.height / rect.height;
+  if (e.touches) return {x:(e.touches[0].clientX-rect.left)*scaleX, y:(e.touches[0].clientY-rect.top)*scaleY};
+  return {x:(e.clientX-rect.left)*scaleX, y:(e.clientY-rect.top)*scaleY};
+}
+
+sigCanvas.addEventListener("mousedown", function(e){drawing=true;var p=getPos(e);lastX=p.x;lastY=p.y;});
+sigCanvas.addEventListener("mousemove", function(e){
+  if(!drawing)return; var p=getPos(e);
+  ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();
+  lastX=p.x;lastY=p.y;hasDrawn=true;
+});
+sigCanvas.addEventListener("mouseup", function(){drawing=false;});
+sigCanvas.addEventListener("mouseleave", function(){drawing=false;});
+sigCanvas.addEventListener("touchstart", function(e){e.preventDefault();drawing=true;var p=getPos(e);lastX=p.x;lastY=p.y;},{passive:false});
+sigCanvas.addEventListener("touchmove", function(e){
+  e.preventDefault();if(!drawing)return;var p=getPos(e);
+  ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();
+  lastX=p.x;lastY=p.y;hasDrawn=true;
+},{passive:false});
+sigCanvas.addEventListener("touchend", function(e){e.preventDefault();drawing=false;},{passive:false});
+
+function clearSig(){initCanvas();}
+
+function validateSig(){
+  if(!hasDrawn){sigCanvas.style.border="2px dashed #E30613";setTimeout(function(){sigCanvas.style.border="1.5px dashed #333";},800);return;}
+  signatureData=sigCanvas.toDataURL("image/png");
+  goStep3();
+}
+
+function redoSig(){
+  signatureData=null;
+  document.getElementById("sigPadArea").classList.remove("hidden");
+  document.getElementById("sigDoneArea").classList.add("hidden");
+  document.getElementById("btnStep3").disabled=true;
+  initCanvas();
+}
+
+function updateSteps(s){
+  currentStep=s;
+  for(var i=1;i<=3;i++){
+    var c=document.getElementById("c"+i);
+    var l=document.getElementById("l"+i);
+    c.className="step-circle"+(i===s?" active":i<s?" done":"");
+    c.textContent=i<s?"&#10003;":i;
+    if(l)l.className="step-label"+(i===s?" active":"");
+    if(i<3){var ln=document.getElementById("ln"+i);if(ln)ln.className="step-line"+(i<s?" done":"");}
+  }
+}
+
+function validateForm(){
+  var ok=true;
+  var nom=document.getElementById("nom").value.trim();
+  var date=document.getElementById("datePaiement").value;
+  var nat=document.getElementById("nature").value;
+  var mont=document.getElementById("montant").value;
+  document.getElementById("err-nom").classList.toggle("hidden",!!nom);
+  document.getElementById("err-date").classList.toggle("hidden",!!date);
+  document.getElementById("err-nature").classList.toggle("hidden",!!nat);
+  document.getElementById("err-montant").classList.toggle("hidden",!!(mont&&!isNaN(mont)&&mont>0));
+  if(!nom||!date||!nat||!mont||isNaN(mont))ok=false;
+  return ok;
+}
+
+function goStep1(){
+  document.getElementById("step1").classList.remove("hidden");
+  document.getElementById("step2").classList.add("hidden");
+  document.getElementById("step3").classList.add("hidden");
+  updateSteps(1);window.scrollTo(0,0);
+}
+function goStep2(){
+  if(currentStep===1&&!validateForm())return;
+  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("step2").classList.remove("hidden");
+  document.getElementById("step3").classList.add("hidden");
+  updateSteps(2);if(!signatureData)initCanvas();window.scrollTo(0,0);
+}
+function goStep3(){
+  if(!signatureData)return;
+  var nom=document.getElementById("nom").value.trim();
+  var dateVal=document.getElementById("datePaiement").value;
+  var nat=document.getElementById("nature").value;
+  var mont=parseFloat(document.getElementById("montant").value).toFixed(2);
+  var lieu=document.getElementById("lieu").value.trim();
+  var today=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  var datePay=dateVal?new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}):"";
+  var lieuDate=lieu?today+", "+lieu:today;
+  document.getElementById("pv-nom").textContent=nom;
+  document.getElementById("pv-date").textContent=datePay;
+  document.getElementById("pv-nature").textContent=nat;
+  document.getElementById("pv-montant").textContent=mont+" \u20AC";
+  document.getElementById("pv-lieu").textContent=lieuDate;
+  var pvSig=document.getElementById("pv-sig");
+  pvSig.src=signatureData;pvSig.classList.remove("hidden");
+  document.getElementById("step1").classList.add("hidden");
+  document.getElementById("step2").classList.add("hidden");
+  document.getElementById("step3").classList.remove("hidden");
+  document.getElementById("successBox").classList.add("hidden");
+  updateSteps(3);window.scrollTo(0,0);
+}
+
+function reset(){
+  document.getElementById("nom").value="";
+  document.getElementById("datePaiement").value="";
+  document.getElementById("nature").value="";
+  document.getElementById("montant").value="";
+  document.getElementById("lieu").value="";
+  signatureData=null;generatedBlob=null;
+  goStep1();
+}
+
+// Generate image using Canvas
+function genImage(){
+  var btn=event.target;
+  btn.textContent="\u23F3 G\u00E9n\u00E9ration...";
+  btn.disabled=true;
+
+  var nom=document.getElementById("nom").value.trim();
+  var dateVal=document.getElementById("datePaiement").value;
+  var nat=document.getElementById("nature").value;
+  var mont=parseFloat(document.getElementById("montant").value).toFixed(2);
+  var lieu=document.getElementById("lieu").value.trim();
+  var today=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  var datePay=dateVal?new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}):"";
+  var lieuDate=lieu?today+", "+lieu:today;
+
+  // A4 at 150dpi
+  var W=1240, PAD=80, contentW=W-PAD*2;
+  var FS=28, LH=FS*1.7;
+  var boldF="bold "+FS+"px Georgia,serif";
+  var normF=FS+"px Georgia,serif";
+  var italF="italic "+(FS*0.9)+"px Georgia,serif";
+
+  // Measure wraps
+  var tmp=document.createElement("canvas"); tmp.width=W; tmp.height=10;
+  var tc=tmp.getContext("2d");
+
+  function wrap(text, font, maxW){
+    tc.font=font;
+    var words=text.split(" "), rows=[], line="";
+    for(var i=0;i<words.length;i++){
+      var test=line?line+" "+words[i]:words[i];
+      if(tc.measureText(test).width>maxW&&line){rows.push(line);line=words[i];}
+      else{line=test;}
+    }
+    if(line)rows.push(line);
+    return rows;
+  }
+
+  var attesteTxt="Atteste sur l\u2019honneur, avoir effectu\u00E9 une d\u00E9pense pour le compte de l\u2019entreprise KOMPAN.";
+  var attesteRows=wrap(attesteTxt, normF, contentW);
+  tc.font=boldF;
+  var natLabel="Nature de la d\u00E9pense : ";
+  var natLabelW=tc.measureText(natLabel).width;
+  var natRows=wrap(nat, normF, contentW-natLabelW);
+
+  // Calculate height
+  var H=Math.round(
+    12 + // top bar
+    60 + 44 + 34 + 36 + // header
+    28 + // hr
+    LH + // Je soussigne
+    attesteRows.length*LH + 8 + // atteste
+    LH + // date
+    natRows.length*LH + 8 + // nature
+    LH + LH*1.6 + LH*1.3 + // montant + mention + hr
+    28 + LH + LH + // bottom
+    80 // padding bottom
+  );
+
+  var cv=document.getElementById("genCanvas");
+  cv.width=W; cv.height=H;
+  var c=cv.getContext("2d");
+
+  c.fillStyle="#fff"; c.fillRect(0,0,W,H);
+  c.fillStyle="#E30613"; c.fillRect(0,0,W,12);
+
+  var y=12+48;
+
+  // Brand
+  c.fillStyle="#E30613"; c.textAlign="center";
+  c.font="bold 18px Arial,sans-serif"; c.fillText("K  O  M  P  A  N",W/2,y); y+=40;
+
+  // Title
+  c.fillStyle="#1a1a1a"; c.font="bold 34px Georgia,serif";
+  c.fillText("ATTESTATION SUR L\u2019HONNEUR",W/2,y); y+=32;
+
+  // Subtitle
+  c.fillStyle="#888"; c.font="20px Georgia,serif";
+  c.fillText("Note de frais",W/2,y); y+=30;
+
+  // HR
+  c.strokeStyle="#ddd"; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(PAD,y); c.lineTo(W-PAD,y); c.stroke(); y+=28;
+
+  c.textAlign="left"; c.fillStyle="#1a1a1a";
+
+  // Je soussigne
+  c.font=boldF; c.fillText("Je soussign\u00E9(e) : ",PAD,y);
+  var lw=c.measureText("Je soussign\u00E9(e) : ").width;
+  c.font=normF; c.fillText(nom,PAD+lw,y);
+  var nw=c.measureText(nom).width;
+  c.beginPath(); c.moveTo(PAD+lw,y+4); c.lineTo(PAD+lw+nw,y+4);
+  c.strokeStyle="#1a1a1a"; c.lineWidth=1.5; c.stroke();
+  y+=LH;
+
+  // Atteste
+  for(var i=0;i<attesteRows.length;i++){
+    var row=attesteRows[i];
+    if(row.indexOf("KOMPAN")>=0){
+      var parts=row.split("KOMPAN");
+      c.font=normF; c.fillStyle="#1a1a1a"; c.fillText(parts[0],PAD,y);
+      var p0w=c.measureText(parts[0]).width;
+      c.font=boldF; c.fillText("KOMPAN",PAD+p0w,y);
+      var kw=c.measureText("KOMPAN").width;
+      c.font=normF; c.fillText(parts[1]||"",PAD+p0w+kw,y);
+    } else {
+      c.font=normF; c.fillStyle="#1a1a1a"; c.fillText(row,PAD,y);
+    }
+    y+=LH;
+  }
+  y+=8;
+
+  // Date paiement
+  c.font=boldF; c.fillStyle="#1a1a1a"; c.fillText("Date du paiement : ",PAD,y);
+  var dw=c.measureText("Date du paiement : ").width;
+  c.font=normF; c.fillText(datePay,PAD+dw,y); y+=LH;
+
+  // Nature
+  c.font=boldF; c.fillStyle="#1a1a1a"; c.fillText(natLabel,PAD,y);
+  c.font=normF;
+  for(var j=0;j<natRows.length;j++){
+    c.fillText(natRows[j], PAD+(j===0?natLabelW:0), y);
+    if(j<natRows.length-1)y+=LH;
+  }
+  y+=LH+8;
+
+  // Montant
+  c.font=boldF; c.fillStyle="#1a1a1a"; c.fillText("Montant TTC : ",PAD,y);
+  var mw=c.measureText("Montant TTC : ").width;
+  c.font=normF; c.fillText(mont+" \u20AC",PAD+mw,y); y+=LH*1.6;
+
+  // Mention
+  c.font=italF; c.fillStyle="#666";
+  c.fillText("Fait pour servir et valoir ce que de droit.",PAD,y); y+=LH*1.3;
+
+  // HR
+  c.strokeStyle="#ddd"; c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(PAD,y); c.lineTo(W-PAD,y); c.stroke(); y+=28;
+
+  // Bottom
+  c.fillStyle="#1a1a1a"; c.font=boldF;
+  c.fillText("Date et lieu :",PAD,y);
+  c.fillText("Signature :",W-PAD-280,y);
+  y+=LH*0.9;
+  c.font=normF; c.fillText(lieuDate,PAD,y);
+
+  // Signature
+  function finalize(){
+    var imgData=cv.toDataURL("image/png");
+    document.getElementById("previewImg").src=imgData;
+    document.getElementById("imgOverlay").classList.add("visible");
+    document.getElementById("successBox").classList.remove("hidden");
+
+    // Store blob for sharing
+    var byteStr=atob(imgData.split(",")[1]);
+    var ab=new ArrayBuffer(byteStr.length);
+    var ia=new Uint8Array(ab);
+    for(var k=0;k<byteStr.length;k++)ia[k]=byteStr.charCodeAt(k);
+    generatedBlob=new Blob([ab],{type:"image/png"});
+
+    btn.textContent="\uD83D\uDCF8 G\u00E9n\u00E9rer l'image";
+    btn.disabled=false;
+  }
+
+  if(signatureData){
+    var img=new Image();
+    img.onload=function(){
+      c.drawImage(img,W-PAD-280,y-LH*0.8,280,110);
+      finalize();
+    };
+    img.onerror=finalize;
+    img.src=signatureData;
+  } else {
+    finalize();
+  }
+}
+
+function closeImg(){
+  document.getElementById("imgOverlay").classList.remove("visible");
+}
+
+async function shareImg(){
+  if(!generatedBlob)return;
+  try{
+    var nom=document.getElementById("nom").value.trim();
+    var file=new File([generatedBlob],"Attestation_KOMPAN.png",{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"Attestation KOMPAN"});
+    }
+  } catch(e){ console.log(e); }
+}
+
+initCanvas();
+</script>
 </body>
 </html>
