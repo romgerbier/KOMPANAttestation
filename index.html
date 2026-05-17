@@ -26,14 +26,20 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--red:#E30613;--bg:#111;--card:#1e1e1e;--card2:#252525;--border:#333;--text:#fff;--muted:#888}
     body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;min-height:100vh;-webkit-tap-highlight-color:transparent}
-    .header{background:var(--bg);border-bottom:2px solid var(--red);position:sticky;top:0;z-index:10}
+
+    /* Safe area pour iOS PWA */
+    .safe-top{height:env(safe-area-inset-top, 44px);background:var(--bg)}
+
+    .header{background:var(--bg);border-bottom:2px solid var(--red)}
     .header-inner{max-width:640px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
     .logo{font-family:Arial Black,sans-serif;font-weight:900;font-size:22px;color:var(--red)}
     .hdiv{width:1px;height:34px;background:var(--border);flex-shrink:0}
     .htitle{font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
     .hsub{font-size:11px;color:var(--muted);margin-top:2px}
     .hsub span{color:var(--red);font-weight:800}
+
     .content{max-width:640px;margin:0 auto;padding:0 20px}
+
     .steps{display:flex;margin:22px 0 26px}
     .step{flex:1;text-align:center;position:relative}
     .step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;margin:0 auto 7px;border:2px solid var(--border);background:#1a1a1a;color:#444;transition:all .3s}
@@ -43,64 +49,55 @@
     .step-label.active{color:var(--text);font-weight:700}
     .step-line{position:absolute;top:15px;left:calc(50% + 18px);right:calc(-50% + 18px);height:1px;background:var(--border);transition:background .3s}
     .step-line.done{background:var(--red)}
+
     .card{background:var(--card);border-radius:14px;padding:26px 22px 22px;border:1px solid var(--border)}
     .field{margin-bottom:20px}
     .field label{display:block;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
     .field label .req{color:var(--red);margin-left:3px}
     .field input,.field select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;color:var(--text);background:var(--card2);outline:none;transition:border .2s;-webkit-appearance:none;appearance:none}
     .field input:focus,.field select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(227,6,19,.15)}
-    .field .hint{color:#444;font-size:11px;margin-top:5px}
+    .field .hint{color:#555;font-size:11px;margin-top:5px}
     .field .err{color:var(--red);font-size:12px;margin-top:4px}
     .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;cursor:pointer}
     option{background:#252525;color:#fff}
+
     .btn-primary{width:100%;padding:13px 0;background:var(--red);border:none;border-radius:9px;font-weight:800;font-size:15px;font-family:inherit;color:#fff;cursor:pointer;letter-spacing:.04em;margin-top:4px;transition:opacity .2s}
     .btn-primary:active{opacity:.85}
-    .btn-primary:disabled{background:#2a2a2a;color:#444;cursor:not-allowed}
     .btn-back{flex:1;padding:12px 0;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px}
     .btn-row{display:flex;gap:10px;margin-top:14px}
+
     .sig-canvas{border:1.5px dashed var(--border);border-radius:10px;background:#fff;cursor:crosshair;width:100%;touch-action:none;display:block;max-height:160px}
     .sig-hint{font-size:11px;color:var(--muted);text-align:center;margin:6px 0}
     .sig-btns{display:flex;gap:8px}
     .sig-clear{flex:1;padding:9px 0;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:inherit;cursor:pointer;font-size:13px}
-    .sig-done{border:1.5px solid var(--red);border-radius:10px;padding:12px;text-align:center;background:var(--card2);margin-bottom:12px}
-    .sig-redo{width:100%;padding:8px 0;background:transparent;border:1.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:inherit;cursor:pointer;font-size:13px;margin-bottom:14px}
-    .doc-preview{background:#fff;border:2px solid var(--red);border-radius:12px;padding:28px 24px;font-family:Georgia,serif;color:#1a1a1a;position:relative;overflow:hidden}
-    .doc-topbar{position:absolute;top:0;left:0;right:0;height:5px;background:var(--red)}
-    .doc-brand{font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.25em;color:var(--red);text-align:center;margin-bottom:6px;margin-top:8px}
-    .doc-title{font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;text-align:center}
-    .doc-sub{font-size:12px;color:#888;text-align:center;margin-top:2px;margin-bottom:18px}
-    .doc-body{font-size:13px;line-height:1.9}
-    .doc-body p{margin-bottom:6px}
-    .doc-mention{font-style:italic;color:#555;font-size:12px;margin-top:12px}
-    .doc-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px}
-    .doc-sig-label{font-size:11px;color:#888;margin-bottom:4px;text-align:right}
-    .doc-sig-img{height:65px;border:1px solid #eee;border-radius:4px;background:#fff;display:block;margin-left:auto}
-    .success-box{text-align:center;background:var(--card);border:1.5px solid var(--red);border-radius:12px;padding:18px 20px;margin-top:16px}
-    .success-box h3{font-weight:700;margin-bottom:8px}
-    .success-box p{color:var(--muted);font-size:13px;margin-bottom:14px}
-    .footer{text-align:center;padding:28px 0 44px;margin-top:8px}
-    .footer-inner{display:inline-block;border-top:1px solid #2a2a2a;padding-top:14px}
-    .footer-made{font-size:10px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:#3a3a3a}
-    .footer-copy{font-size:10px;color:#2a2a2a;margin-top:3px;letter-spacing:.05em}
-    .hidden{display:none!important}
-    input[type="date"]{color-scheme:dark}
 
     /* IMAGE OVERLAY */
     #imgOverlay{display:none;position:fixed;inset:0;z-index:10000;background:#000;flex-direction:column}
     #imgOverlay.visible{display:flex}
-    .img-toolbar{background:#1a1a1a;border-bottom:2px solid var(--red);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .img-toolbar{background:#1a1a1a;border-bottom:2px solid var(--red);padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
     .img-toolbar-title{font-weight:700;font-size:14px;color:#fff}
     .img-toolbar-sub{font-size:11px;color:var(--muted);margin-top:2px}
     .img-close{background:#333;border:none;border-radius:8px;color:#fff;font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;font-weight:600}
     .img-scroll{flex:1;overflow:auto;padding:16px;display:flex;align-items:flex-start;justify-content:center}
     #previewImg{max-width:100%;border-radius:8px;display:block}
-    .img-hint{text-align:center;padding:12px 16px;background:#1a1a1a;border-top:1px solid #333;flex-shrink:0}
-    .img-share-btn{display:block;width:100%;background:#fff;border:2px solid var(--red);border-radius:8px;color:var(--red);font-weight:800;font-size:16px;padding:13px 24px;cursor:pointer;font-family:inherit;margin-bottom:10px;letter-spacing:.03em}
-    .img-new-btn{background:var(--red);border:none;border-radius:8px;color:#fff;font-weight:800;font-size:14px;padding:11px 24px;cursor:pointer;font-family:inherit}
-    #genCanvas{display:none}
+    .img-hint{text-align:center;padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));background:#1a1a1a;border-top:1px solid #333;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+    .img-share-btn{display:block;width:100%;background:#fff;border:2px solid var(--red);border-radius:8px;color:var(--red);font-weight:800;font-size:15px;padding:12px;cursor:pointer;font-family:inherit}
+    .img-new-btn{background:var(--red);border:none;border-radius:8px;color:#fff;font-weight:800;font-size:14px;padding:11px;cursor:pointer;font-family:inherit;width:100%}
+
+    .footer{text-align:center;padding:28px 0 44px;margin-top:8px}
+    .footer-inner{display:inline-block;border-top:1px solid #2a2a2a;padding-top:14px}
+    .footer-made{font-size:10px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:#3a3a3a}
+    .footer-copy{font-size:10px;color:#2a2a2a;margin-top:3px}
+
+    .hidden{display:none!important}
+    input[type="date"]{color-scheme:dark}
+    #genCanvas{position:fixed;left:-9999px;top:0}
   </style>
 </head>
 <body>
+
+<!-- Safe area iOS -->
+<div class="safe-top"></div>
 
 <div class="header">
   <div class="header-inner">
@@ -114,124 +111,106 @@
 </div>
 
 <div class="content">
+
   <div class="steps">
-    <div class="step">
-      <div class="step-circle active" id="c1">1</div>
-      <div class="step-label active" id="l1">Infos</div>
-      <div class="step-line" id="ln1"></div>
-    </div>
-    <div class="step">
-      <div class="step-circle" id="c2">2</div>
-      <div class="step-label" id="l2">Signature</div>
-      <div class="step-line" id="ln2"></div>
-    </div>
-    <div class="step">
-      <div class="step-circle" id="c3">3</div>
-      <div class="step-label" id="l3">Aper&ccedil;u</div>
-    </div>
+    <div class="step"><div class="step-circle active" id="c1">1</div><div class="step-label active" id="l1">Infos</div><div class="step-line" id="ln1"></div></div>
+    <div class="step"><div class="step-circle" id="c2">2</div><div class="step-label" id="l2">Signature</div><div class="step-line" id="ln2"></div></div>
+    <div class="step"><div class="step-circle" id="c3">3</div><div class="step-label" id="l3">Aper&ccedil;u</div></div>
   </div>
 
   <!-- STEP 1 -->
-  <div class="card" id="step1">
-    <div class="field">
-      <label>Nom et pr&eacute;nom <span class="req">*</span></label>
-      <input type="text" id="nom" placeholder="Votre nom complet"/>
-      <div class="err hidden" id="err-nom">Champ requis</div>
+  <div id="step1">
+    <div class="card">
+      <div class="field">
+        <label>Nom et pr&eacute;nom <span class="req">*</span></label>
+        <input type="text" id="nom" placeholder="Votre nom complet"/>
+        <div class="err hidden" id="errNom">Champ requis</div>
+      </div>
+      <div class="field">
+        <label>Date du paiement <span class="req">*</span></label>
+        <input type="date" id="datePaiement"/>
+        <div class="err hidden" id="errDate">Champ requis</div>
+      </div>
+      <div class="field">
+        <label>Nature de la d&eacute;pense <span class="req">*</span></label>
+        <select id="nature">
+          <option value="">-- S&eacute;lectionner --</option>
+          <option>Achat petit mat&eacute;riel pour projets d'installation</option>
+          <option>Autres frais de personnel</option>
+          <option>Autres frais de v&eacute;hicule</option>
+          <option>D&eacute;placement, h&ocirc;tel</option>
+          <option>D&eacute;placement, repas individuel (midi ou soir)</option>
+          <option>D&eacute;placements - Autres</option>
+          <option>Frais bancaires</option>
+          <option>Parking</option>
+          <option>Repas - Reunion, Formation, Autres (sans TVA)</option>
+          <option>V&eacute;hicule, Entretien camion ISA</option>
+          <option>V&eacute;hicule, carburant camion ISA</option>
+        </select>
+        <div class="err hidden" id="errNature">Champ requis</div>
+      </div>
+      <div class="field">
+        <label>Montant TTC (&euro;) <span class="req">*</span></label>
+        <input type="number" id="montant" placeholder="0.00" step="0.01" min="0"/>
+        <div class="err hidden" id="errMontant">Montant invalide</div>
+      </div>
+      <div class="field">
+        <label>Lieu de r&eacute;daction de l'attestation</label>
+        <input type="text" id="lieu" placeholder="Ex : Paris, Lyon..."/>
+        <div class="hint">&#128205; Ville depuis laquelle vous &eacute;tablissez cette attestation</div>
+      </div>
+      <button class="btn-primary" onclick="goStep2()">Suivant &rarr; Signature</button>
     </div>
-    <div class="field">
-      <label>Date du paiement <span class="req">*</span></label>
-      <input type="date" id="datePaiement"/>
-      <div class="err hidden" id="err-date">Champ requis</div>
-    </div>
-    <div class="field">
-      <label>Nature de la d&eacute;pense <span class="req">*</span></label>
-      <select id="nature">
-        <option value="">-- S&eacute;lectionner --</option>
-        <option>Achat petit mat&eacute;riel pour projets d'installation</option>
-        <option>Autres frais de personnel</option>
-        <option>Autres frais de v&eacute;hicule</option>
-        <option>D&eacute;placement, h&ocirc;tel</option>
-        <option>D&eacute;placement, repas individuel (midi ou soir)</option>
-        <option>D&eacute;placements - Autres</option>
-        <option>Frais bancaires</option>
-        <option>Parking</option>
-        <option>Repas - Reunion, Formation, Autres (sans TVA)</option>
-        <option>V&eacute;hicule, Entretien camion ISA</option>
-        <option>V&eacute;hicule, carburant camion ISA</option>
-      </select>
-      <div class="err hidden" id="err-nature">Champ requis</div>
-    </div>
-    <div class="field">
-      <label>Montant TTC (&euro;) <span class="req">*</span></label>
-      <input type="number" id="montant" placeholder="0.00" step="0.01" min="0"/>
-      <div class="err hidden" id="err-montant">Montant invalide</div>
-    </div>
-    <div class="field">
-      <label>Lieu de r&eacute;daction de l'attestation</label>
-      <input type="text" id="lieu" placeholder="Ex : Paris, Lyon..."/>
-      <div class="hint">&#128205; Ville depuis laquelle vous &eacute;tablissez cette attestation</div>
-    </div>
-    <button class="btn-primary" onclick="goStep2()">Suivant &rarr; Signature</button>
   </div>
 
   <!-- STEP 2 -->
-  <div class="card hidden" id="step2">
-    <div style="margin-bottom:20px">
-      <div style="font-weight:700;font-size:16px;margin-bottom:5px">Votre signature</div>
-      <div style="color:var(--muted);font-size:13px">Signez dans le cadre ci-dessous.</div>
-    </div>
-    <div id="sigPadArea">
+  <div id="step2" class="hidden">
+    <div class="card">
+      <div style="margin-bottom:16px">
+        <div style="font-weight:700;font-size:16px;margin-bottom:4px">Votre signature</div>
+        <div style="color:var(--muted);font-size:13px">Signez puis validez pour continuer.</div>
+      </div>
       <canvas id="sigCanvas" class="sig-canvas" width="500" height="160"></canvas>
       <div class="sig-hint">Signez avec votre doigt ou votre souris</div>
       <div class="sig-btns">
         <button class="sig-clear" onclick="clearSig()">&#10005; Effacer</button>
-        <button class="btn-primary" onclick="validateSig()" style="flex:2;margin-top:0;padding:9px 0;font-size:13px">&#10003; Valider &amp; continuer</button>
+        <button class="btn-primary" onclick="validateSig()" style="flex:2;margin-top:0;padding:9px 0;font-size:13px">&#10003; Valider &amp; voir l'aper&ccedil;u</button>
       </div>
-    </div>
-    <div id="sigDoneArea" class="hidden">
-      <div class="sig-done"><img id="sigPreview" src="" style="max-height:100px" alt="sig"/></div>
-      <button class="sig-redo" onclick="redoSig()">&#8635; Recommencer</button>
-    </div>
-    <div class="btn-row">
-      <button class="btn-back" onclick="goStep1()">&#8592; Retour</button>
-      <button class="btn-primary" id="btnStep3" onclick="goStep3()" disabled style="flex:2;margin-top:0">Voir l'aper&ccedil;u &rarr;</button>
+      <div class="btn-row"><button class="btn-back" onclick="goStep1()">&#8592; Retour</button></div>
     </div>
   </div>
 
   <!-- STEP 3 -->
-  <div class="hidden" id="step3">
-    <div class="doc-preview">
-      <div class="doc-topbar"></div>
-      <div class="doc-brand">KOMPAN</div>
-      <div class="doc-title">Attestation sur l'Honneur</div>
-      <div class="doc-sub">Note de frais</div>
-      <hr style="border:none;border-top:1px solid #ddd;margin-bottom:14px"/>
-      <div class="doc-body">
-        <p>Je soussign&eacute;(e) : <strong><span id="pv-nom" style="border-bottom:1px solid #333;padding-bottom:1px"></span></strong></p>
-        <p>Atteste sur l'honneur, avoir effectu&eacute; une d&eacute;pense pour le compte de l'entreprise <strong>KOMPAN</strong>.</p>
-        <p><strong>Date du paiement :</strong> <span id="pv-date"></span></p>
-        <p><strong>Nature de la d&eacute;pense :</strong> <span id="pv-nature"></span></p>
-        <p><strong>Montant TTC :</strong> <span id="pv-montant"></span></p>
+  <div id="step3" class="hidden">
+    <!-- Aperçu document -->
+    <div class="card" style="background:#fff;color:#1a1a1a;font-family:Georgia,serif;border-color:var(--red)">
+      <div style="background:var(--red);height:5px;margin:-26px -22px 22px"></div>
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-family:Arial Black,sans-serif;font-weight:900;font-size:11px;letter-spacing:.3em;color:var(--red);margin-bottom:6px">KOMPAN</div>
+        <div style="font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase">Attestation sur l'Honneur</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">Note de frais</div>
       </div>
-      <p class="doc-mention">Fait pour servir et valoir ce que de droit.</p>
-      <div class="doc-bottom">
-        <div style="font-size:13px"><strong>Date et lieu :</strong><br/><span id="pv-lieu"></span></div>
-        <div>
-          <div class="doc-sig-label">Signature</div>
-          <img id="pv-sig" class="doc-sig-img hidden" src="" alt="sig"/>
+      <hr style="border:none;border-top:1px solid #ddd;margin-bottom:14px"/>
+      <div style="font-size:13px;line-height:1.9">
+        <p>Je soussign&eacute;(e) : <strong><span id="pvNom" style="border-bottom:1px solid #333;padding-bottom:1px"></span></strong></p>
+        <p>Atteste sur l'honneur, avoir effectu&eacute; une d&eacute;pense pour le compte de l'entreprise <strong>KOMPAN</strong>.</p>
+        <p><strong>Date du paiement :</strong> <span id="pvDate"></span></p>
+        <p><strong>Nature de la d&eacute;pense :</strong> <span id="pvNature"></span></p>
+        <p><strong>Montant TTC :</strong> <span id="pvMontant"></span></p>
+      </div>
+      <p style="font-style:italic;color:#555;font-size:12px;margin-top:12px">Fait pour servir et valoir ce que de droit.</p>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px">
+        <div style="font-size:13px"><strong>Date et lieu :</strong><br/><span id="pvLieu"></span></div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:#888;margin-bottom:4px">Signature</div>
+          <img id="pvSig" src="" style="height:60px;border:1px solid #eee;border-radius:4px;background:#fff;display:block;margin-left:auto"/>
         </div>
       </div>
     </div>
 
-    <div class="btn-row" style="margin:18px 0">
+    <div class="btn-row" style="margin:14px 0">
       <button class="btn-back" onclick="goStep2()">&#8592; Modifier</button>
-      <button class="btn-primary" onclick="genImage()" style="flex:2;margin-top:0">&#128248; G&eacute;n&eacute;rer l'image</button>
-    </div>
-
-    <div class="success-box hidden" id="successBox">
-      <h3>&#10003; Image g&eacute;n&eacute;r&eacute;e !</h3>
-      <p>Appuyez longuement sur l'image pour l'enregistrer dans Photos.</p>
-      <button class="img-new-btn" onclick="reset()">+ Nouvelle attestation</button>
+      <button class="btn-primary" onclick="genImage(event)" style="flex:2;margin-top:0">&#128248; G&eacute;n&eacute;rer l'image</button>
     </div>
   </div>
 
@@ -248,15 +227,13 @@
   <div class="img-toolbar">
     <div>
       <div class="img-toolbar-title">&#128248; Attestation KOMPAN</div>
-      <div class="img-toolbar-sub">Appuyez longuement sur l'image &rarr; Enregistrer dans Photos</div>
+      <div class="img-toolbar-sub">Appuyez longuement sur l'image &rarr; Photos</div>
     </div>
     <button class="img-close" onclick="closeImg()">&#10005; Fermer</button>
   </div>
-  <div class="img-scroll">
-    <img id="previewImg" src="" alt="attestation"/>
-  </div>
+  <div class="img-scroll"><img id="previewImg" src="" alt="attestation"/></div>
   <div class="img-hint">
-    <button class="img-share-btn" onclick="shareImg()">&#8599; Partager / Enregistrer</button>
+    <button class="img-share-btn" onclick="shareImg()">&#8599; Partager / Enregistrer dans Photos</button>
     <button class="img-new-btn" onclick="closeImg();reset()">+ Nouvelle attestation</button>
   </div>
 </div>
@@ -266,108 +243,91 @@
 <script>
 document.getElementById("yr").textContent = new Date().getFullYear();
 
-var signatureData = null;
-var hasDrawn = false;
-var drawing = false;
-var lastX = 0, lastY = 0;
-var currentStep = 1;
+var sigData = null, drawing = false, hasDrawn = false, lastX = 0, lastY = 0;
 var generatedBlob = null;
-
-// Canvas signature
 var sigCanvas = document.getElementById("sigCanvas");
-var ctx = sigCanvas.getContext("2d");
+var sCtx = sigCanvas.getContext("2d");
 
-function initCanvas() {
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
-  ctx.strokeStyle = "#111";
-  ctx.lineWidth = 2.5;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
+function initCanvas(){
+  sCtx.fillStyle = "#fff";
+  sCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
+  sCtx.strokeStyle = "#111";
+  sCtx.lineWidth = 2.5;
+  sCtx.lineCap = "round";
+  sCtx.lineJoin = "round";
   hasDrawn = false;
 }
 
-function getPos(e) {
-  var rect = sigCanvas.getBoundingClientRect();
-  var scaleX = sigCanvas.width / rect.width;
-  var scaleY = sigCanvas.height / rect.height;
-  if (e.touches) return {x:(e.touches[0].clientX-rect.left)*scaleX, y:(e.touches[0].clientY-rect.top)*scaleY};
-  return {x:(e.clientX-rect.left)*scaleX, y:(e.clientY-rect.top)*scaleY};
+function getPos(e){
+  var r = sigCanvas.getBoundingClientRect();
+  var sx = sigCanvas.width / r.width, sy = sigCanvas.height / r.height;
+  if(e.touches) return {x:(e.touches[0].clientX-r.left)*sx, y:(e.touches[0].clientY-r.top)*sy};
+  return {x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy};
 }
 
-sigCanvas.addEventListener("mousedown", function(e){drawing=true;var p=getPos(e);lastX=p.x;lastY=p.y;});
+sigCanvas.addEventListener("mousedown", function(e){drawing=true; var p=getPos(e); lastX=p.x; lastY=p.y;});
 sigCanvas.addEventListener("mousemove", function(e){
-  if(!drawing)return; var p=getPos(e);
-  ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();
-  lastX=p.x;lastY=p.y;hasDrawn=true;
+  if(!drawing) return;
+  var p=getPos(e);
+  sCtx.beginPath(); sCtx.moveTo(lastX,lastY); sCtx.lineTo(p.x,p.y); sCtx.stroke();
+  lastX=p.x; lastY=p.y; hasDrawn=true;
 });
 sigCanvas.addEventListener("mouseup", function(){drawing=false;});
 sigCanvas.addEventListener("mouseleave", function(){drawing=false;});
-sigCanvas.addEventListener("touchstart", function(e){e.preventDefault();drawing=true;var p=getPos(e);lastX=p.x;lastY=p.y;},{passive:false});
+sigCanvas.addEventListener("touchstart", function(e){e.preventDefault(); drawing=true; var p=getPos(e); lastX=p.x; lastY=p.y;}, {passive:false});
 sigCanvas.addEventListener("touchmove", function(e){
-  e.preventDefault();if(!drawing)return;var p=getPos(e);
-  ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.stroke();
-  lastX=p.x;lastY=p.y;hasDrawn=true;
-},{passive:false});
-sigCanvas.addEventListener("touchend", function(e){e.preventDefault();drawing=false;},{passive:false});
+  e.preventDefault();
+  if(!drawing) return;
+  var p=getPos(e);
+  sCtx.beginPath(); sCtx.moveTo(lastX,lastY); sCtx.lineTo(p.x,p.y); sCtx.stroke();
+  lastX=p.x; lastY=p.y; hasDrawn=true;
+}, {passive:false});
+sigCanvas.addEventListener("touchend", function(e){e.preventDefault(); drawing=false;}, {passive:false});
 
-function clearSig(){initCanvas();}
+function clearSig(){ initCanvas(); }
 
-function validateSig(){
-  if(!hasDrawn){sigCanvas.style.border="2px dashed #E30613";setTimeout(function(){sigCanvas.style.border="1.5px dashed #333";},800);return;}
-  signatureData=sigCanvas.toDataURL("image/png");
-  goStep3();
-}
-
-function redoSig(){
-  signatureData=null;
-  document.getElementById("sigPadArea").classList.remove("hidden");
-  document.getElementById("sigDoneArea").classList.add("hidden");
-  document.getElementById("btnStep3").disabled=true;
-  initCanvas();
-}
-
+// STEPS
 function updateSteps(s){
-  currentStep=s;
   for(var i=1;i<=3;i++){
-    var c=document.getElementById("c"+i);
-    var l=document.getElementById("l"+i);
+    var c=document.getElementById("c"+i), l=document.getElementById("l"+i);
     c.className="step-circle"+(i===s?" active":i<s?" done":"");
-    c.textContent=i<s?"&#10003;":i;
-    if(l)l.className="step-label"+(i===s?" active":"");
-    if(i<3){var ln=document.getElementById("ln"+i);if(ln)ln.className="step-line"+(i<s?" done":"");}
+    c.textContent=i<s?"\u2713":i;
+    if(l) l.className="step-label"+(i===s?" active":"");
+    if(i<3){ var ln=document.getElementById("ln"+i); if(ln) ln.className="step-line"+(i<s?" done":""); }
   }
 }
+function showStep(n){
+  for(var i=1;i<=3;i++) document.getElementById("step"+i).classList.toggle("hidden", i!==n);
+}
 
-function validateForm(){
-  var ok=true;
+function validate(){
   var nom=document.getElementById("nom").value.trim();
   var date=document.getElementById("datePaiement").value;
   var nat=document.getElementById("nature").value;
   var mont=document.getElementById("montant").value;
-  document.getElementById("err-nom").classList.toggle("hidden",!!nom);
-  document.getElementById("err-date").classList.toggle("hidden",!!date);
-  document.getElementById("err-nature").classList.toggle("hidden",!!nat);
-  document.getElementById("err-montant").classList.toggle("hidden",!!(mont&&!isNaN(mont)&&mont>0));
-  if(!nom||!date||!nat||!mont||isNaN(mont))ok=false;
+  var ok=true;
+  document.getElementById("errNom").classList.toggle("hidden", !!nom);
+  document.getElementById("errDate").classList.toggle("hidden", !!date);
+  document.getElementById("errNature").classList.toggle("hidden", !!nat);
+  document.getElementById("errMontant").classList.toggle("hidden", !!(mont&&!isNaN(mont)&&parseFloat(mont)>0));
+  if(!nom||!date||!nat||!mont||isNaN(mont)) ok=false;
   return ok;
 }
 
-function goStep1(){
-  document.getElementById("step1").classList.remove("hidden");
-  document.getElementById("step2").classList.add("hidden");
-  document.getElementById("step3").classList.add("hidden");
-  updateSteps(1);window.scrollTo(0,0);
-}
+function goStep1(){ updateSteps(1); showStep(1); window.scrollTo(0,0); }
 function goStep2(){
-  if(currentStep===1&&!validateForm())return;
-  document.getElementById("step1").classList.add("hidden");
-  document.getElementById("step2").classList.remove("hidden");
-  document.getElementById("step3").classList.add("hidden");
-  updateSteps(2);if(!signatureData)initCanvas();window.scrollTo(0,0);
+  if(!validate()) return;
+  updateSteps(2); showStep(2);
+  if(!sigData) initCanvas();
+  window.scrollTo(0,0);
 }
-function goStep3(){
-  if(!signatureData)return;
+function validateSig(){
+  if(!hasDrawn){
+    sigCanvas.style.border="2px dashed #E30613";
+    setTimeout(function(){sigCanvas.style.border="1.5px dashed #333";}, 800);
+    return;
+  }
+  sigData = sigCanvas.toDataURL("image/png");
   var nom=document.getElementById("nom").value.trim();
   var dateVal=document.getElementById("datePaiement").value;
   var nat=document.getElementById("nature").value;
@@ -376,18 +336,13 @@ function goStep3(){
   var today=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
   var datePay=dateVal?new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}):"";
   var lieuDate=lieu?today+", "+lieu:today;
-  document.getElementById("pv-nom").textContent=nom;
-  document.getElementById("pv-date").textContent=datePay;
-  document.getElementById("pv-nature").textContent=nat;
-  document.getElementById("pv-montant").textContent=mont+" \u20AC";
-  document.getElementById("pv-lieu").textContent=lieuDate;
-  var pvSig=document.getElementById("pv-sig");
-  pvSig.src=signatureData;pvSig.classList.remove("hidden");
-  document.getElementById("step1").classList.add("hidden");
-  document.getElementById("step2").classList.add("hidden");
-  document.getElementById("step3").classList.remove("hidden");
-  document.getElementById("successBox").classList.add("hidden");
-  updateSteps(3);window.scrollTo(0,0);
+  document.getElementById("pvNom").textContent=nom;
+  document.getElementById("pvDate").textContent=datePay;
+  document.getElementById("pvNature").textContent=nat;
+  document.getElementById("pvMontant").textContent=mont+" \u20AC";
+  document.getElementById("pvLieu").textContent=lieuDate;
+  document.getElementById("pvSig").src=sigData;
+  updateSteps(3); showStep(3); window.scrollTo(0,0);
 }
 
 function reset(){
@@ -396,13 +351,25 @@ function reset(){
   document.getElementById("nature").value="";
   document.getElementById("montant").value="";
   document.getElementById("lieu").value="";
-  signatureData=null;generatedBlob=null;
+  sigData=null; generatedBlob=null;
   goStep1();
 }
 
-// Generate image using Canvas
-function genImage(){
-  var btn=event.target;
+// CANVAS IMAGE GENERATION
+function wrap(ctx, text, font, maxW){
+  ctx.font=font;
+  var words=text.split(" "), rows=[], line="";
+  for(var i=0;i<words.length;i++){
+    var test=line?line+" "+words[i]:words[i];
+    if(ctx.measureText(test).width>maxW&&line){rows.push(line);line=words[i];}
+    else line=test;
+  }
+  if(line) rows.push(line);
+  return rows;
+}
+
+function genImage(evt){
+  var btn=evt.target;
   btn.textContent="\u23F3 G\u00E9n\u00E9ration...";
   btn.disabled=true;
 
@@ -415,70 +382,55 @@ function genImage(){
   var datePay=dateVal?new Date(dateVal).toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"}):"";
   var lieuDate=lieu?today+", "+lieu:today;
 
-  // A4 at 150dpi
-  var W=1240, PAD=80, contentW=W-PAD*2;
-  var FS=28, LH=FS*1.7;
-  var boldF="bold "+FS+"px Georgia,serif";
-  var normF=FS+"px Georgia,serif";
-  var italF="italic "+(FS*0.9)+"px Georgia,serif";
+  var W=1240, PAD=80, cW=W-PAD*2;
+  var FS=28, LH=Math.round(FS*1.7);
+  var bF="bold "+FS+"px Georgia,serif";
+  var nF=FS+"px Georgia,serif";
+  var iF="italic "+Math.round(FS*0.9)+"px Georgia,serif";
 
-  // Measure wraps
+  // measure wraps
   var tmp=document.createElement("canvas"); tmp.width=W; tmp.height=10;
   var tc=tmp.getContext("2d");
+  var attTxt="Atteste sur l\u2019honneur, avoir effectu\u00E9 une d\u00E9pense pour le compte de l\u2019entreprise KOMPAN.";
+  var attRows=wrap(tc, attTxt, nF, cW);
+  tc.font=bF;
+  var natLW=tc.measureText("Nature de la d\u00E9pense : ").width;
+  var natRows=wrap(tc, nat, nF, cW-natLW);
 
-  function wrap(text, font, maxW){
-    tc.font=font;
-    var words=text.split(" "), rows=[], line="";
-    for(var i=0;i<words.length;i++){
-      var test=line?line+" "+words[i]:words[i];
-      if(tc.measureText(test).width>maxW&&line){rows.push(line);line=words[i];}
-      else{line=test;}
-    }
-    if(line)rows.push(line);
-    return rows;
-  }
-
-  var attesteTxt="Atteste sur l\u2019honneur, avoir effectu\u00E9 une d\u00E9pense pour le compte de l\u2019entreprise KOMPAN.";
-  var attesteRows=wrap(attesteTxt, normF, contentW);
-  tc.font=boldF;
-  var natLabel="Nature de la d\u00E9pense : ";
-  var natLabelW=tc.measureText(natLabel).width;
-  var natRows=wrap(nat, normF, contentW-natLabelW);
-
-  // Calculate height
   var H=Math.round(
-    12 + // top bar
-    60 + 44 + 34 + 36 + // header
-    28 + // hr
-    LH + // Je soussigne
-    attesteRows.length*LH + 8 + // atteste
-    LH + // date
-    natRows.length*LH + 8 + // nature
-    LH + LH*1.6 + LH*1.3 + // montant + mention + hr
-    28 + LH + LH + // bottom
-    80 // padding bottom
+    12 + 84 + 40 + 32 + 28 + 28 +  // top bar + brand + title + sub + HR + padding
+    LH +                             // Je soussigné
+    attRows.length*LH + 10 +         // Atteste
+    LH +                             // Date paiement
+    natRows.length*LH + 10 +         // Nature
+    LH + LH*1.6 + LH*1.3 +          // Montant + Mention + HR
+    28 + LH + LH + 80               // Bottom + signature + padding
   );
 
   var cv=document.getElementById("genCanvas");
   cv.width=W; cv.height=H;
   var c=cv.getContext("2d");
 
+  // Background
   c.fillStyle="#fff"; c.fillRect(0,0,W,H);
+
+  // Red top bar
   c.fillStyle="#E30613"; c.fillRect(0,0,W,12);
 
-  var y=12+48;
+  var y=12+84;
 
   // Brand
   c.fillStyle="#E30613"; c.textAlign="center";
-  c.font="bold 18px Arial,sans-serif"; c.fillText("K  O  M  P  A  N",W/2,y); y+=40;
+  c.font="bold 18px Arial,sans-serif";
+  c.fillText("K  O  M  P  A  N", W/2, y); y+=40;
 
   // Title
   c.fillStyle="#1a1a1a"; c.font="bold 34px Georgia,serif";
-  c.fillText("ATTESTATION SUR L\u2019HONNEUR",W/2,y); y+=32;
+  c.fillText("ATTESTATION SUR L\u2019HONNEUR", W/2, y); y+=32;
 
   // Subtitle
   c.fillStyle="#888"; c.font="20px Georgia,serif";
-  c.fillText("Note de frais",W/2,y); y+=30;
+  c.fillText("Note de frais", W/2, y); y+=30;
 
   // HR
   c.strokeStyle="#ddd"; c.lineWidth=1.5;
@@ -486,94 +438,94 @@ function genImage(){
 
   c.textAlign="left"; c.fillStyle="#1a1a1a";
 
-  // Je soussigne
-  c.font=boldF; c.fillText("Je soussign\u00E9(e) : ",PAD,y);
+  // Je soussigné
+  c.font=bF;
+  c.fillText("Je soussign\u00E9(e) : ", PAD, y);
   var lw=c.measureText("Je soussign\u00E9(e) : ").width;
-  c.font=normF; c.fillText(nom,PAD+lw,y);
+  c.font=nF; c.fillText(nom, PAD+lw, y);
   var nw=c.measureText(nom).width;
   c.beginPath(); c.moveTo(PAD+lw,y+4); c.lineTo(PAD+lw+nw,y+4);
   c.strokeStyle="#1a1a1a"; c.lineWidth=1.5; c.stroke();
   y+=LH;
 
   // Atteste
-  for(var i=0;i<attesteRows.length;i++){
-    var row=attesteRows[i];
+  for(var i=0;i<attRows.length;i++){
+    var row=attRows[i];
     if(row.indexOf("KOMPAN")>=0){
-      var parts=row.split("KOMPAN");
-      c.font=normF; c.fillStyle="#1a1a1a"; c.fillText(parts[0],PAD,y);
-      var p0w=c.measureText(parts[0]).width;
-      c.font=boldF; c.fillText("KOMPAN",PAD+p0w,y);
+      var pts=row.split("KOMPAN");
+      c.font=nF; c.fillStyle="#1a1a1a"; c.fillText(pts[0],PAD,y);
+      var p0w=c.measureText(pts[0]).width;
+      c.font=bF; c.fillText("KOMPAN",PAD+p0w,y);
       var kw=c.measureText("KOMPAN").width;
-      c.font=normF; c.fillText(parts[1]||"",PAD+p0w+kw,y);
+      c.font=nF; c.fillText(pts[1]||"",PAD+p0w+kw,y);
     } else {
-      c.font=normF; c.fillStyle="#1a1a1a"; c.fillText(row,PAD,y);
+      c.font=nF; c.fillStyle="#1a1a1a"; c.fillText(row,PAD,y);
     }
     y+=LH;
   }
-  y+=8;
+  y+=10;
 
   // Date paiement
-  c.font=boldF; c.fillStyle="#1a1a1a"; c.fillText("Date du paiement : ",PAD,y);
+  c.font=bF; c.fillStyle="#1a1a1a";
+  c.fillText("Date du paiement : ",PAD,y);
   var dw=c.measureText("Date du paiement : ").width;
-  c.font=normF; c.fillText(datePay,PAD+dw,y); y+=LH;
+  c.font=nF; c.fillText(datePay,PAD+dw,y); y+=LH;
 
   // Nature
-  c.font=boldF; c.fillStyle="#1a1a1a"; c.fillText(natLabel,PAD,y);
-  c.font=normF;
+  c.font=bF; c.fillStyle="#1a1a1a";
+  c.fillText("Nature de la d\u00E9pense : ",PAD,y);
+  c.font=nF;
   for(var j=0;j<natRows.length;j++){
-    c.fillText(natRows[j], PAD+(j===0?natLabelW:0), y);
-    if(j<natRows.length-1)y+=LH;
+    c.fillText(natRows[j], PAD+(j===0?natLW:0), y);
+    if(j<natRows.length-1) y+=LH;
   }
-  y+=LH+8;
+  y+=LH+10;
 
   // Montant
-  c.font=boldF; c.fillStyle="#1a1a1a"; c.fillText("Montant TTC : ",PAD,y);
+  c.font=bF; c.fillStyle="#1a1a1a";
+  c.fillText("Montant TTC : ",PAD,y);
   var mw=c.measureText("Montant TTC : ").width;
-  c.font=normF; c.fillText(mont+" \u20AC",PAD+mw,y); y+=LH*1.6;
+  c.font=nF; c.fillText(mont+" \u20AC",PAD+mw,y); y+=Math.round(LH*1.6);
 
   // Mention
-  c.font=italF; c.fillStyle="#666";
-  c.fillText("Fait pour servir et valoir ce que de droit.",PAD,y); y+=LH*1.3;
+  c.font=iF; c.fillStyle="#666";
+  c.fillText("Fait pour servir et valoir ce que de droit.",PAD,y); y+=Math.round(LH*1.3);
 
   // HR
   c.strokeStyle="#ddd"; c.lineWidth=1.5;
   c.beginPath(); c.moveTo(PAD,y); c.lineTo(W-PAD,y); c.stroke(); y+=28;
 
   // Bottom
-  c.fillStyle="#1a1a1a"; c.font=boldF;
+  c.fillStyle="#1a1a1a"; c.font=bF;
   c.fillText("Date et lieu :",PAD,y);
   c.fillText("Signature :",W-PAD-280,y);
-  y+=LH*0.9;
-  c.font=normF; c.fillText(lieuDate,PAD,y);
+  y+=Math.round(LH*0.9);
+  c.font=nF; c.fillText(lieuDate,PAD,y);
 
-  // Signature
-  function finalize(){
+  function finish(){
     var imgData=cv.toDataURL("image/png");
     document.getElementById("previewImg").src=imgData;
     document.getElementById("imgOverlay").classList.add("visible");
-    document.getElementById("successBox").classList.remove("hidden");
-
-    // Store blob for sharing
-    var byteStr=atob(imgData.split(",")[1]);
-    var ab=new ArrayBuffer(byteStr.length);
+    // store blob
+    var b=atob(imgData.split(",")[1]);
+    var ab=new ArrayBuffer(b.length);
     var ia=new Uint8Array(ab);
-    for(var k=0;k<byteStr.length;k++)ia[k]=byteStr.charCodeAt(k);
+    for(var k=0;k<b.length;k++) ia[k]=b.charCodeAt(k);
     generatedBlob=new Blob([ab],{type:"image/png"});
-
     btn.textContent="\uD83D\uDCF8 G\u00E9n\u00E9rer l'image";
     btn.disabled=false;
   }
 
-  if(signatureData){
+  if(sigData){
     var img=new Image();
     img.onload=function(){
-      c.drawImage(img,W-PAD-280,y-LH*0.8,280,110);
-      finalize();
+      c.drawImage(img, W-PAD-280, y-Math.round(LH*0.8), 280, 110);
+      finish();
     };
-    img.onerror=finalize;
-    img.src=signatureData;
+    img.onerror=finish;
+    img.src=sigData;
   } else {
-    finalize();
+    finish();
   }
 }
 
@@ -582,12 +534,11 @@ function closeImg(){
 }
 
 async function shareImg(){
-  if(!generatedBlob)return;
+  if(!generatedBlob) return;
   try{
-    var nom=document.getElementById("nom").value.trim();
     var file=new File([generatedBlob],"Attestation_KOMPAN.png",{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:"Attestation KOMPAN"});
+      await navigator.share({files:[file], title:"Attestation KOMPAN"});
     }
   } catch(e){ console.log(e); }
 }
